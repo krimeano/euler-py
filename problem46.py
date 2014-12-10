@@ -15,7 +15,8 @@ What is the smallest odd composite that cannot be written as the sum of a prime 
 """
 __author__ = 'sergeyp'
 
-import math, mylib
+import math
+import mylib
 
 def process_number(n):
     rn = math.floor(n ** 0.5)
