@@ -23,7 +23,7 @@ def process_number(n):
         k = n -  2 * i ** 2
         #print(n, rn, i, k)
         if mylib.isPrime(k):
-            print(n, '=', k, '+ 2 *', i, '^2')
+            print(n, '=', k, '+ 2 *', i, '^ 2')
             break
     else:
         print(n, ': NOT FOUND')
