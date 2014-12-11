@@ -88,6 +88,22 @@ def find_dividers(a, f=2, distinct=False):
     return d
 
 
+def mutate(dd, prefix=''):
+    l = len(dd)
+    if not l:
+        return []
+    if l == 1:
+        return [prefix + str(dd[0])]
+    ss = set()
+    for i in range(l):
+        m = mutate(dd[0:i] + dd[i + 1:l], prefix + str(dd[i]))
+        for a in m:
+            ss.add(a)
+    out = list(ss)
+    out.sort()
+    return out
+
+
 if __name__ == '__main__':
     print(isPrime(1009))
     print(knownPrimes)
