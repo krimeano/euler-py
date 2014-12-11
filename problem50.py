@@ -1,26 +1,41 @@
-"""
-The prime 41, can be written as the sum of six consecutive primes:
-
-41 = 2 + 3 + 5 + 7 + 11 + 13
-This is the longest sum of consecutive primes that adds to a prime below one-hundred.
-
-The longest sum of consecutive primes below one-thousand that adds to a prime, contains 21 terms, and is equal to 953.
-
-Which prime, below one-million, can be written as the sum of the most consecutive primes?
-"""
 __author__ = 'sergeyp'
 
 import mylib
 
-def sumPrimes(N):
-    while len(mylib.knownPrimes) < N:
-        print(mylib.primesGenerator.__next__())
+
+def solve():
+    # a = mylib.findPrimesToLimit(25, True)
+    # a = mylib.findPrimesToLimit(90, True)
+    a = mylib.findPrimesToLimit(3940, True)
+
+    s = sum(a)
+    print(s, len(a), a)
+    print ('-' * 79)
+    sum_all(a)
+    return True
+
+
+def sum_all(a):
+    y = len(a)
+    i = y
+    f = False
+    while i:
+        x = y - i
+        if i % 2:
+            r = range(1, x + 1)
+        else:
+            r = range(1)
+        for j in r:
+            b = a[j:j + i]
+            s = sum(b)
+            if mylib.isPrime(s):
+                f = True
+                print(s, b, i)
+        if f:
+            break
+        i -= 1
+    return True
+
 
 if __name__ == '__main__':
-    a = mylib.findPrimesToLimit(100, True)
-    # b = 0
-    # for x in a:
-    #     print(x)
-    #     b += x
-    # print(len(a), b, mylib.isPrime(b))
-    print (sum(a), a)
+    print(solve())
