@@ -104,6 +104,11 @@ def mutate(dd, prefix=''):
     return out
 
 
+def is_palindrome(a):
+    b = str(a)
+    return b[::-1] == b
+
+
 if __name__ == '__main__':
     print(isPrime(1009))
     print(knownPrimes)
