@@ -9,7 +9,7 @@ def solve():
     print(3, '/', 7, '=', f0)
     print('-' * 79)
     best_result = (1, 1, 1, 1, [], [])
-    for x in range(2, 1000000):
+    for x in range(1000000, 1, -1):
         n = math.floor(f0 * x)
         f = n / x
         d = f0 - f
