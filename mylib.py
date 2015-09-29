@@ -1,4 +1,4 @@
-import math
+import math, sys
 
 knownPrimes = []
 
@@ -109,6 +109,42 @@ def is_palindrome(a):
     return b[::-1] == b
 
 
+gcd_cache = {}
+
+
+def find_gcd(a, b):
+    """
+    Returns the Greatest common divisor
+    :param a:
+    :param b:
+    :return:
+    """
+    if a == b:
+        return a
+    x = max(a, b)
+    y = min(a, b)
+    cache_key = '-'.join([str(x), str(y)])
+    if cache_key in gcd_cache:
+        # print('   ', cache_key, 'found cache!')
+        return gcd_cache[cache_key]
+    gcd_cache[cache_key] = find_gcd(y, x - y)
+    return gcd_cache[cache_key]
+
+
+def find_relaitvely_primes(n):
+    r = []
+    if n < 2:
+        return r
+    r.append(1)
+    for x in range(2, n):
+        # print(x)
+        if find_gcd(n, x) == 1:
+            r.append(x)
+
+    return r
+
+
 if __name__ == '__main__':
-    print(isPrime(1009))
-    print(knownPrimes)
+    # print(find_relaitvely_primes(1000))
+    # print(find_relaitvely_primes(10000))
+    findPrimesToLimit(10)
