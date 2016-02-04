@@ -25,30 +25,25 @@ class PolyNumber:
         return ((b ** 2 + 4 * a * N) ** 0.5 - b) / (2 * a)
 
 
+def make_chain(current_chains, nnn):
+    if not len(nnn):
+        return current_chains
+    chains = []
+    for i in range(len(nnn)):
+        nnn_rest = nnn[:i] + nnn[i+1:]
+
+    return chains
+
 def solve():
-    bbb = dict()
-    eee = dict()
+    nnn = []
     for x in range(3, 9):
         f = math.ceil(PolyNumber.find_n(x, 1000))
         t = math.ceil(PolyNumber.find_n(x, 9999))
         nn = [int(PolyNumber(x, y)) for y in range(f, t)]
-        print(x, f, t, nn)
-        bbb[x] = dict()
-        eee[x] = dict()
-        for y in nn:
-            b = str(y)[:2]
-            e = str(y)[2:]
-            if b not in bbb[x]:
-                bbb[x][b] = []
-            if e not in eee[x]:
-                eee[x][e] = []
-            bbb[x][b].append(y)
-            eee[x][e].append(y)
-        print(bbb[x])
-        print(eee[x])
-    for a in eee[3]:
-        if a in bbb[4]:
-            print(a, eee[3][a], bbb[4][a])
+        #print(x, nn)
+        nnn.append(nn)
+    chain = make_chain([], nnn)
+    print(chain)
     return 0
 
 
