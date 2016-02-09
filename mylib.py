@@ -65,7 +65,14 @@ def get_first_divider(a):
     return hasDividerFromKnownPrimes(a)
 
 
+cache_dividers = {}
+cache_dividers_distinct = {}
+
+
 def find_dividers(a, f=2, distinct=False):
+    cache = cache_dividers_distinct if distinct else cache_dividers
+    if a in cache:
+        return cache[a]
     d = []
     c = math.floor(a ** 0.5)
     if a < 2:
@@ -78,14 +85,30 @@ def find_dividers(a, f=2, distinct=False):
             return [a]
         if dividable(a, b):
             d = [b]
-            if a > b ** 2:
+            if a >= b ** 2:
                 d += find_dividers(a // b, b)
             if distinct:
                 d = list(set(d))
                 d.sort()
+            cache[a] = d
             return d
     d = [a]
+    cache[a] = d
     return d
+
+
+def gather_dividers(a):
+    dividers = find_dividers(a)
+    out = []
+    for x in dividers:
+        is_found = False
+        for xx in out:
+            if x in xx:
+                xx.append(x)
+                is_found = True
+        if not is_found:
+            out.append([x])
+    return out
 
 
 def mutate(dd, prefix=''):
@@ -152,6 +175,15 @@ def hcf(x, y):
         x, y = y, x % y
 
     return x
+
+
+def mult(l):
+    out = 1
+    for x in l:
+        if not x:
+            return 0
+        out *= x
+    return out
 
 
 if __name__ == '__main__':
