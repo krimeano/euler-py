@@ -14,22 +14,14 @@ class CardanoTriplets():
             if p % 27:
                 continue
             b_max = min(int((p / 27) ** 0.5 // 1), self.limit - a)
-            # if b_max > self.limit - a:
-            #     continue
-            # print(p, b_max)
             for b in range(1, b_max + 1):
                 c = self.a_polynom(a) / 27 / b ** 2
                 if not c % 1 and a + b + c <= self.limit:
                     t = [a, b, int(c)]
                     tv = self.check_triplet(t)
                     print(t, tv)
-                    self.triplets.append([a, b, c])
-                    # for c in range(1, self.limit - a - b):
-                    #     t = [a, b, c]
-                    #     tv = self.check_triplet(t)
-                    #     if 1000000000 * abs(1 - tv) < 1:
-                    #         self.triplets.append(t)
-                    #         print('    ', a, b, c, a + b + c, tv)
+                    self.triplets.append(t)
+        return self
 
     @staticmethod
     def solve_cubic_1_3b_c_d(b, c, d):
@@ -43,7 +35,6 @@ class CardanoTriplets():
             m = -m
             s = -1
         t = (z + y) ** (1 / 3) + s * m ** (1 / 3) - b
-        # print(b, c, d, p, q, z, y)
         return t
 
     @staticmethod
@@ -60,37 +51,16 @@ class CardanoTriplets():
 
         return (t[0] + t[1] * t[2] ** 0.5) ** (1 / 3) + s * m ** (1 / 3)
 
-    def split_c(self, c, top_limit):
-
+    @staticmethod
+    def get_square_dividers(c):
         ddd = mylib.gather_dividers(c)
-        m = 1
-        dd_sq = []
+        out = []
         for dd in ddd:
             if len(dd) < 2:
                 continue
             for i in range(len(dd) // 2):
-                dd_sq.append(dd[0])
-                m *= dd[0]
-        c_base = int(c / m ** 2)
-        return self.multiply_variants(c_base, dd_sq, top_limit)
-
-    def multiply_variants(self, c_base, dd_sq, top_limit):
-        b = mylib.mult(dd_sq)
-        # print('   ', b, c_base, dd_sq)
-        out = []
-        if c_base > top_limit:
-            return out
-        if b + c_base <= top_limit:
-            out.append((b, c_base,))
-        if b == 1:
-            return out
-        for i in range(len(dd_sq)):
-            new_dd = dd_sq[:i] + dd_sq[i + 1:]
-
-            x = dd_sq[i]
-            c = c_base * x * x
-            out += self.multiply_variants(c, new_dd, top_limit)
-        return list(set(out))
+                out.append(dd[0])
+        return out
 
     def find_by_k(self):
         """
@@ -100,60 +70,42 @@ class CardanoTriplets():
         :return:
         """
         self.triplets = []
-        for bk in range(1, (self.limit + 1) // 4 + 1):
+        for bk in range(1, self.get_max_q()):
             ck = (8 * bk - 3)
             ak = 3 * bk - 1
+            sq_d = self.get_square_dividers(ck)
             if ak + bk + ck > self.limit:
-                if mylib.isPrime(ck):
+                if mylib.isPrime(ck) and not len(sq_d):
                     continue
-
-                ddd = mylib.gather_dividers(ck)
-
-                sq_d = False
-                for dd in ddd:
-                    p = len(dd) // 2
-                    if p:
-                        sq_d = True
-                        break
-                if not sq_d:
-                    continue
-
-            # print(ak, bk, ck)
-            c0 = ck * bk * bk
-            ccc = self.split_c(c0, self.limit - ak)
-            if not len(ccc):
+            m0 = mylib.mult(sq_d)
+            b0 = bk * m0
+            c0 = int(ck / m0 / m0)
+            if c0 > self.limit - ak - 1:
                 continue
-            for cb in ccc:
-                t = [ak, cb[0], cb[1]]
+            b_limit = self.limit - ak - c0
+            bm_bm = [(x, int(b0 / x) ** 2) for x in mylib.find_composite_dividers(b0, b_limit)]
+            for bm in bm_bm:
+                b = bm[0]
+                c = c0 * bm[1]
+                if ak + b + c > self.limit:
+                    continue
+                t = [ak, b, c]
                 self.triplets.append(t)
                 print(t, len(self.triplets))
+            continue
+        return self
 
-        return True
+    def get_max_q(self):
+        a = self.solve_cubic_1_3b_c_d(1 / 12, 3 / 2, -(4 * self.limit ** 3 + 1) / 12)
+        print(a)
+        return math.floor((a + 1) / 3)
 
 
 class Problem251:
     @staticmethod
     def test():
-        """
-[314, 315, 93] 1.0
-[341, 171, 404] 1.0
-[341, 342, 101] 1.0
-[347, 290, 148] 1.0
-[347, 580, 37] 1.0
-[368, 369, 109] 0.9999999999999982
-[386, 301, 189] 1.0
-[395, 297, 208] 1.0
-[395, 396, 117] 0.9999999999999982
-[422, 423, 125] 1.0
-        :return:
-        """
         ct = CardanoTriplets(1000)
         ct.find_by_k()
-        # ct.find_brute()
-        # print(len(ct.triplets), ct.triplets)
-        # ct.find()
-        print(len(ct.triplets), ct.triplets)
-        print(len(mylib.cache_dividers))
         return len(ct.triplets) == 149
 
     @staticmethod
@@ -164,11 +116,6 @@ class Problem251:
 
 
 if __name__ == '__main__':
-    # for i in range(1, 101):
-    #     print(i, mylib.gather_dividers(mylib.find_dividers(i)))
-    #
-    # print(110000000, mylib.find_dividers(109999999))
-
     if Problem251.test():
         print('*' * 79)
         print(Problem251.solve())
