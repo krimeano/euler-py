@@ -111,6 +111,33 @@ def gather_dividers(a):
     return out
 
 
+def product_lists(aa, bb, c_max=0):
+    cc = []
+    for a in aa:
+        for b in bb:
+            c = a * b
+            if not c_max or c <= c_max:
+                cc.append(c)
+    return sorted(cc)
+
+
+def find_composite_dividers(a, c_max=0):
+    if a == 1:
+        return [1]
+    gathered = gather_dividers(a)
+    vvv = []
+    cc = [1]
+    for dd in gathered:
+        vv = []
+        d = dd[0]
+        for i in range(len(dd) + 1):
+            vv.append(d ** i)
+        vvv.append(vv)
+    for vv in vvv:
+        cc = product_lists(cc, vv, c_max)
+    return cc
+
+
 def mutate(dd, prefix=''):
     l = len(dd)
     if not l:
