@@ -138,6 +138,23 @@ def find_composite_dividers(a, c_max=0):
     return cc
 
 
+def find_rational_dividers(a, c_max=0):
+    if a == 1:
+        return [1]
+    gathered = gather_dividers(a)
+    vvv = []
+    cc = [1]
+    for dd in gathered:
+        vv = []
+        d = dd[0]
+        for i in range(-len(dd), len(dd) + 1):
+            vv.append(d ** i)
+        vvv.append(vv)
+    for vv in vvv:
+        cc = product_lists(cc, vv, c_max)
+    return cc
+
+
 def mutate(dd, prefix=''):
     l = len(dd)
     if not l:
@@ -226,6 +243,4 @@ def totient(n):
 
 
 if __name__ == '__main__':
-    # print(find_relaitvely_primes(1000))
-    # print(find_relaitvely_primes(10000))
-    findPrimesToLimit(10)
+    print(find_rational_dividers(20))  # 1, 2, 4, 5, 10, 20, 1/2, 1/4, 1/5, 1/10, 1/20, 2/5, 4/5
