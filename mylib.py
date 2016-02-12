@@ -213,6 +213,18 @@ def mult(l):
     return out
 
 
+def totient(n):
+    if n == 1:
+        return 1
+    dd = find_dividers(n, distinct=True)
+    phi = n - 1
+    for d in dd:
+        if d == n:
+            continue
+        phi -= n / d - 1
+    return int(phi)
+
+
 if __name__ == '__main__':
     # print(find_relaitvely_primes(1000))
     # print(find_relaitvely_primes(10000))
