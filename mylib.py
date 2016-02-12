@@ -48,7 +48,7 @@ def findPrimesToLimit(L, explicit=False):
         m = knownPrimes[len(knownPrimes) - 1]
     while r >= m:
         m = primesGenerator.__next__()
-    return knownPrimes[:-1]
+    return [x for x in knownPrimes if x <= r]
 
 
 def isPrime(a):
@@ -211,6 +211,18 @@ def mult(l):
             return 0
         out *= x
     return out
+
+
+def totient(n):
+    if n == 1:
+        return 1
+    dd = find_dividers(n, distinct=True)
+    phi = n - 1
+    for d in dd:
+        if d == n:
+            continue
+        phi -= n / d - 1
+    return int(phi)
 
 
 if __name__ == '__main__':
