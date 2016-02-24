@@ -16,7 +16,7 @@ def hasDividerFromKnownPrimes(a):
         # print('next prime:', b)
         if b > c:
             return False
-        if dividable(a, b):
+        if not a % b:
             return b
     return False
 
@@ -48,6 +48,7 @@ def findPrimesToLimit(L, explicit=False):
         m = knownPrimes[len(knownPrimes) - 1]
     while r >= m:
         m = primesGenerator.__next__()
+        print(m, 'prime')
     return [x for x in knownPrimes if x <= r]
 
 
@@ -83,7 +84,7 @@ def find_dividers(a, f=2, distinct=False):
             continue
         if b > c:
             return [a]
-        if dividable(a, b):
+        if not a % b:
             d = [b]
             if a >= b ** 2:
                 d += find_dividers(a // b, b)
@@ -231,15 +232,58 @@ def mult(l):
 
 
 def totient(n):
-    if n == 1:
+    if n < 2:
         return 1
+    # if isPrime(n):
+    #     return n -1
     dd = find_dividers(n, distinct=True)
-    phi = n - 1
+    phi = n
     for d in dd:
-        if d == n:
-            continue
-        phi -= n / d - 1
+        phi *= (d - 1) / d
     return int(phi)
+
+
+def make_primes_sieve(limit):
+    r = math.floor(limit ** 0.5)
+    known_primes = make_primes_sieve_init(r)
+    p_max = max(known_primes)
+    print(limit, r, known_primes[-10:], "\n")
+    modulo = 1
+    p_min = 1
+    pp = set()
+    for x in known_primes:
+        if modulo * x > r:
+            break
+        modulo *= x
+        p_min = x
+        pp.add(x)
+    for p in [1] + [x for x in known_primes if (x > p_min) and (x < modulo)]:
+        print("\033[F\033[K", p, modulo)
+        pp |= set(range(p, limit, modulo))
+    # print(sorted(pp))
+    if 1 in pp:
+        pp.remove(1)
+    for p in [x for x in known_primes if x > p_min]:
+        print("\033[F\033[K", p, '/', p_max, end=' ')
+        ss = set(range(p ** 2, limit + 1, p))
+        print('-', len(ss), 'items')
+        pp -= ss
+    return sorted(pp)
+
+
+def make_primes_sieve_init(L):
+    r = int(L ** 0.5 // 1)
+    pp = set(range(5, L + 1, 6)) | set(range(7, L + 1, 6))
+    dd = set(range(5, r + 1, 6)) | set(range(7, r + 1, 6))
+    pp.add(2)
+    pp.add(3)
+    print("\033[F\033[K", 1, ', len = ', len(dd))
+    while len(dd):
+        d = min(dd)
+        pp -= set(range(d * 2, L + 1, d))
+        dd -= set(range(d, r + 1, d))
+        print("\033[F\033[K", d, ', len =', len(dd))
+    return sorted(pp)
 
 
 if __name__ == '__main__':
