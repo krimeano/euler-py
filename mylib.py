@@ -187,15 +187,20 @@ def find_gcd(a, b):
     :param b:
     :return:
     """
+    print(a, b)
     if a == b:
         return a
     x = max(a, b)
     y = min(a, b)
+    r = x % y
     cache_key = '-'.join([str(x), str(y)])
     if cache_key in gcd_cache:
         # print('   ', cache_key, 'found cache!')
         return gcd_cache[cache_key]
-    gcd_cache[cache_key] = find_gcd(y, x - y)
+    if r:
+        gcd_cache[cache_key] = find_gcd(y, r)
+    else:
+        gcd_cache[cache_key] = y
     return gcd_cache[cache_key]
 
 
@@ -243,48 +248,60 @@ def totient(n):
     return int(phi)
 
 
-def make_primes_sieve(limit):
-    r = math.floor(limit ** 0.5)
-    known_primes = make_primes_sieve_init(r)
-    p_max = max(known_primes)
-    print(limit, r, known_primes[-10:], "\n")
-    modulo = 1
-    p_min = 1
-    pp = set()
-    for x in known_primes:
-        if modulo * x > r:
-            break
-        modulo *= x
-        p_min = x
-        pp.add(x)
-    for p in [1] + [x for x in known_primes if (x > p_min) and (x < modulo)]:
-        print("\033[F\033[K", p, modulo)
-        pp |= set(range(p, limit, modulo))
-    # print(sorted(pp))
-    if 1 in pp:
-        pp.remove(1)
-    for p in [x for x in known_primes if x > p_min]:
-        print("\033[F\033[K", p, '/', p_max, end=' ')
-        ss = set(range(p ** 2, limit + 1, p))
-        print('-', len(ss), 'items')
-        pp -= ss
-    return sorted(pp)
+def make_primes_sieve_atkin(limit):
+    """
+    https://ru.wikipedia.org/wiki/%D0%A0%D0%B5%D1%88%D0%B5%D1%82%D0%BE_%D0%90%D1%82%D0%BA%D0%B8%D0%BD%D0%B0
+    :param limit:
+    :return:
+    """
+    out = {}
+    out[2] = True
+    out[3] = True
+    r = int(limit ** 0.5 // 1) + 1
 
+    # Предположительно простые - это целые с нечетным числом
+    # представлений в данных квадратных формах.
+    # x2 и y2 - это квадраты i и j (оптимизация).
+    x2 = 0
+    for i in range(1, r):
+        x2 += 2 * i - 1
+        y2 = 0
+        for j in range(1, r):
+            y2 += 2 * j - 1
+            n = 4 * x2 + y2
+            if (n <= limit) and (n % 12 == 1 or n % 12 == 5):
+                print("\033[F\033[K", i, j, n, 'invert')
+                out[n] = not out[n] if n in out else True
 
-def make_primes_sieve_init(L):
-    r = int(L ** 0.5 // 1)
-    pp = set(range(5, L + 1, 6)) | set(range(7, L + 1, 6))
-    dd = set(range(5, r + 1, 6)) | set(range(7, r + 1, 6))
-    pp.add(2)
-    pp.add(3)
-    print("\033[F\033[K", 1, ', len = ', len(dd))
-    while len(dd):
-        d = min(dd)
-        pp -= set(range(d * 2, L + 1, d))
-        dd -= set(range(d, r + 1, d))
-        print("\033[F\033[K", d, ', len =', len(dd))
-    return sorted(pp)
+            # n = 3 * x2 + y2
+            n -= x2  # Optimization
+            if (n <= limit) and (n % 12 == 7):
+                print("\033[F\033[K", i, j, n, 'invert')
+                out[n] = not out[n] if n in out else True
+
+            # n = 3 * x2 - y2;
+            n -= 2 * y2  # Optimization
+            if (i > j) and (n <= limit) and (n % 12 == 11):
+                print("\033[F\033[K", i, j, n, 'invert')
+                out[n] = not out[n] if n in out else True
+
+    # Отсеиваем кратные квадратам простых чисел в интервале [5, sqrt(limit)].
+    # (основной этап не может их отсеять)
+    for i in range(1, r):
+        if i in out and out[i]:
+            n = i * i
+            print("\033[F\033[K", n, 'is square')
+        for j in range(n, limit + 1, n):
+            out[j] = False
+
+    for i in range(9, limit + 1, 3):
+        out[i] = False
+
+    for i in range(25, limit + 1, 5):
+        out[i] = False
+
+    return tuple(x for x in out if out[x])
 
 
 if __name__ == '__main__':
-    print(find_rational_dividers(20))  # 1, 2, 4, 5, 10, 20, 1/2, 1/4, 1/5, 1/10, 1/20, 2/5, 4/5
+    print(find_gcd(1170, 108))
