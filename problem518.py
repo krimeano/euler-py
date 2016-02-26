@@ -129,18 +129,60 @@ class Triplets:
         return self
 
     def find_triplets_4(self):
-        pp = mylib.make_primes_sieve(self.limit)
-        for p in pp:
-            for q in [x for x in pp if x > p]:
-                sq = (p + 1) * (q + 1)
-                s = round(sq ** 0.5)
-                if s ** 2 != sq:
-                    continue
-                if s-1 not in pp:
-                    continue
-                t = (p, s - 1, q)
-                self.triplets.append(t)
-                print("\033[F\033[K", t, len(self.triplets))
+        pp = mylib.make_primes_sieve_atkin(self.limit)
+        bb = dict()
+        r = int(self.limit ** 0.5 // 1)
+        ss = [x ** 2 for x in pp if x < r]
+        print(len(pp), "primes")
+        print(len(ss), "squares\n")
+
+        for a in pp:
+            print("\033[F\033[K", a, "filtering")
+            for s in ss:
+                if not (a + 1) % s:
+                    b = (a + 1) // s
+                    bb[a] = b
+                    if (b - 1) in bb and bb[b - 1] != b:
+                        bb[a] = bb[b - 1]
+                    break
+            else:
+                bb[a] = a + 1
+                continue
+        # print(bb)
+        aaa = dict()
+        for a in bb:
+            print("\033[F\033[K", a, 'combining')
+            if bb[a] not in aaa:
+                aaa[bb[a]] = []
+            aaa[bb[a]].append(a)
+        # print(aaa)
+        for b in aaa:
+            if len(aaa[b]) < 2:
+                continue
+            print(b, sorted(aaa[b]), "\n")
+            aa = sorted(aaa[b])
+            for p in aa:
+                for q in aa:
+                    if q <= p:
+                        continue
+                    r = int(((p + 1) * (q + 1)) ** 0.5 // 1) - 1
+                    if r not in pp:
+                        continue
+                    t = (p, r, q)
+                    self.triplets.append(t)
+                    print("\033[F\033[K", t, len(self.triplets))
+
+        # for p in pp:
+        #     for q in [x for x in pp if x > p]:
+        #         sq = (p + 1) * (q + 1)
+        #         s = round(sq ** 0.5)
+        #         if s ** 2 != sq:
+        #             continue
+        #         if s-1 not in pp:
+        #             continue
+        #         t = (p, s - 1, q)
+        #         self.triplets.append(t)
+        #         print("\033[F\033[K", t, len(self.triplets))
         return self
 
 

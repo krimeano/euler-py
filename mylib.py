@@ -304,4 +304,4 @@ def make_primes_sieve_atkin(limit):
 
 
 if __name__ == '__main__':
-    print(find_gcd(1170, 108))
+    print(mutate('001122', ))

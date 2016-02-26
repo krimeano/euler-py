@@ -136,7 +136,7 @@ def make_simple_pythagorean_triples(s_max):
 
 
 if __name__ == '__main__':
-    limit = 1500000
+    limit = 1500
     ss = make_simple_pythagorean_triples(limit)
     print(ss)
     xx = {}
