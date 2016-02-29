@@ -304,4 +304,23 @@ def make_primes_sieve_atkin(limit):
 
 
 if __name__ == '__main__':
-    print(mutate('001122', ))
+    k = 0
+    # for x in range(1, 10 ** 8 + 1):
+    #     dd = find_dividers(x)
+    #     if len(dd) == 2:
+    #         k += 1
+    #         print(x, dd, k)
+    m = 30
+    pp = make_primes_sieve_atkin(m // 2)
+    for i in range(len(pp)):
+        x = pp[i]
+        if x ** 2 > m:
+            break
+        for j in range(i, len(pp)):
+            y = pp[j]
+            n = x * y
+            if n > m:
+                break
+            k += 1
+            print(n, [x, y], k)
+    print(k)
