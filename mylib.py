@@ -48,7 +48,7 @@ def findPrimesToLimit(L, explicit=False):
         m = knownPrimes[len(knownPrimes) - 1]
     while r >= m:
         m = primesGenerator.__next__()
-        print(m, 'prime')
+        # print(m, 'prime')
     return [x for x in knownPrimes if x <= r]
 
 
@@ -302,25 +302,33 @@ def make_primes_sieve_atkin(limit):
 
     return tuple(x for x in out if out[x])
 
+class Fraction:
+    def __init__(self, n, d):
+        self.n = n
+        self.d = d
+
+    def get_period(self):
+        # print(self.n / self.d, "\n")
+        p = ''
+        n = self.n % self.d
+        d = self.d
+        nn = set()
+        while n not in nn:
+            # print("\033[F\033[K" + str(len(p)), p[-5:], n, d)
+            nn.add(n)
+            p += str((n * 10) // d)
+            n = (n * 10) % d
+        return p
 
 if __name__ == '__main__':
-    k = 0
-    # for x in range(1, 10 ** 8 + 1):
-    #     dd = find_dividers(x)
-    #     if len(dd) == 2:
-    #         k += 1
-    #         print(x, dd, k)
-    m = 30
-    pp = make_primes_sieve_atkin(m // 2)
-    for i in range(len(pp)):
-        x = pp[i]
-        if x ** 2 > m:
-            break
-        for j in range(i, len(pp)):
-            y = pp[j]
-            n = x * y
-            if n > m:
-                break
-            k += 1
-            print(n, [x, y], k)
-    print(k)
+    f = Fraction(1, 17)
+    p = f.get_period()
+    print(p[:11], p[-5:], len(p))
+    print('SOLVED:', sum([int(y) for y in p]))
+    for x in range(724700000, 730000000):
+        m = 5678900000000137 * x
+        if str(m).find('999999999') >= 0:
+            p = Fraction(1, x).get_period()
+            print(x, m, 10 ** 12 / x)
+            print(p[:11], p[-5:], len(p))
+            print('SOLVED:', sum([int(y) for y in p]), "\n")
