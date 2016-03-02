@@ -187,7 +187,7 @@ def find_gcd(a, b):
     :param b:
     :return:
     """
-    print(a, b)
+    # print(a, b)
     if a == b:
         return a
     x = max(a, b)
@@ -302,6 +302,7 @@ def make_primes_sieve_atkin(limit):
 
     return tuple(x for x in out if out[x])
 
+
 class Fraction:
     def __init__(self, n, d):
         self.n = n
@@ -320,15 +321,11 @@ class Fraction:
             n = (n * 10) % d
         return p
 
+
 if __name__ == '__main__':
-    f = Fraction(1, 17)
-    p = f.get_period()
-    print(p[:11], p[-5:], len(p))
-    print('SOLVED:', sum([int(y) for y in p]))
-    for x in range(724700000, 730000000):
-        m = 5678900000000137 * x
-        if str(m).find('999999999') >= 0:
-            p = Fraction(1, x).get_period()
-            print(x, m, 10 ** 12 / x)
-            print(p[:11], p[-5:], len(p))
-            print('SOLVED:', sum([int(y) for y in p]), "\n")
+    m = 0
+    for x in range(1, 10**6):
+        dd = find_composite_dividers(x)
+        if m < len(dd):
+            m = len(dd)
+            print(x, m, find_dividers(x), dd)

@@ -53,6 +53,8 @@
 000 0 0 0 0
 00 00 00 0
 00 00 0 0 0
+00 0 0 0 0 0
+0 0 0 0 0 0 0
 7 - 13
 --------------------
 00000000
@@ -153,6 +155,44 @@
 00 00 0 0 0 0 0 0
 00 0 0 0 0 0 0 0 0
 0 0 0 0 0 0 0 0 0 0
-10 - 44
+10 - 42
 --------------------
 """
+
+ways_cache = dict()
+
+
+def count_ways(n, m=0, prefix=''):
+    """
+    :param n: - coins to separate
+    :param m: - max coins in one partitions
+    :param prefix:
+    :return:
+    """
+    if n < 2:
+        return 1
+    w = 0
+    max_k = min(n, m) if m else n
+    if max_k < 2:
+        return 1
+    if n in ways_cache:
+        if max_k in ways_cache[n]:
+            # print(prefix + 'get cache for', n, max_k, '=', ways_cache[n][max_k])
+            return ways_cache[n][max_k]
+    else:
+        ways_cache[n] = dict()
+    # print(prefix + 'max_k', m, n, max_k)
+    for k in range(1, max_k + 1):
+        w += count_ways(n - k, k, prefix + ' > ')
+    # print(prefix + 'ways for', n, '<=', m, '=', w)
+    ways_cache[n][max_k] = w % 10000000
+    return w % 10000000
+
+
+if __name__ == '__main__':
+    for coins in range(1, 10000):
+        ways = count_ways(coins)
+        print("\033[F\033[K", coins, ways)
+        if not ways % 10 ** 4:
+            print("\033[F\033[K", coins, ways, "\n")
+    print(ways_cache)
