@@ -15,7 +15,7 @@ class Problem357:
         m = 100000000
         data = [2]
         for a in range(6, m, 4):
-            if not mylib.isPrime(a + 1) or not mylib.isPrime(a / 2 + 2):
+            if not mylib.is_prime(a + 1) or not mylib.is_prime(a / 2 + 2):
                 continue
             dd = mylib.find_composite_dividers(a)
             if len(dd) % 2:
@@ -24,7 +24,7 @@ class Problem357:
             all_primes = True
             for i in range(2, len(dd) // 2):
                 b = dd[i] + dd[len(dd) - i - 1]
-                all_primes = all_primes and mylib.isPrime(b)
+                all_primes = all_primes and mylib.is_prime(b)
                 # print('   ', dd[i], dd[len(dd) - i - 1], b, all_primes)
                 if not all_primes:
                     break

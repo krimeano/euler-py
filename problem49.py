@@ -25,7 +25,7 @@ def solve():
                     if mylib.dividable(a + b + c + d, 3):
                         continue
                     s = [a, b, c, d]
-                    m = [y for y in [int(x) for x in mylib.mutate(s)] if int(y) > 1000 and mylib.isPrime(y)]
+                    m = [y for y in [int(x) for x in mylib.mutate(s)] if int(y) > 1000 and mylib.is_prime(y)]
                     if len(m) < 3:
                         continue
                     pr = extract_progression(m)

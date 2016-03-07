@@ -18,7 +18,7 @@ def ww_to_n(w_list):
 m = 0
 s = 2 * 3 * 5 * 7
 for n in range(s, 180181, s):
-    if mylib.isPrime(n):
+    if mylib.is_prime(n):
         continue
     pd = mylib.find_dividers(n)
     if len(pd) < 4:

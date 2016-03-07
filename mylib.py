@@ -1,18 +1,18 @@
 import math, sys
 
-knownPrimes = []
+known_primes = dict()
 
 
 def dividable(a, b):
     return a % b == 0
 
 
-def hasDividerFromKnownPrimes(a):
+def has_divider_from_known_primes(a):
     c = math.floor(a ** 0.5)
     # print('square root:', c)
-    if a in knownPrimes:
+    if a in known_primes:
         return False
-    for b in knownPrimes:
+    for b in sorted(known_primes):
         # print('next prime:', b)
         if b > c:
             return False
@@ -21,49 +21,50 @@ def hasDividerFromKnownPrimes(a):
     return False
 
 
-def genPrime():
-    if not len(knownPrimes):
-        knownPrimes.append(2)
+def gen_prime():
+    if not len(known_primes):
+        known_primes[2] = True
         yield 2
-    if len(knownPrimes) == 1:
-        knownPrimes.append(3)
+    if len(known_primes) == 1:
+        known_primes[3] = True
         yield 3
     while True:
-        x = knownPrimes[len(knownPrimes) - 1] + 2
-        while hasDividerFromKnownPrimes(x):
+        x = max(known_primes.keys()) + 2
+        # print(x)
+        while has_divider_from_known_primes(x):
             x += 2
-        knownPrimes.append(x)
+        known_primes[x] = True
         yield x
 
 
-primesGenerator = genPrime()
+primes_generator = gen_prime()
 
 
-def findPrimesToLimit(L, explicit=False):
+def find_primes_to_limit(L, explicit=False):
     r = L
     if not explicit:
         r = math.floor(L ** 0.5)
     m = 1
-    if len(knownPrimes):
-        m = knownPrimes[len(knownPrimes) - 1]
+    if len(known_primes):
+        m = max(known_primes.keys())
     while r >= m:
-        m = primesGenerator.__next__()
+        m = primes_generator.__next__()
         # print(m, 'prime')
-    return [x for x in knownPrimes if x <= r]
+    return dict((x, True) for x in known_primes if x <= r)
 
 
-def isPrime(a):
+def is_prime(a):
     if a < 2:
         return False
-    findPrimesToLimit(a)
-    return not hasDividerFromKnownPrimes(a)
+    find_primes_to_limit(a)
+    return not has_divider_from_known_primes(a)
 
 
 def get_first_divider(a):
     if a < 2:
         return False
-    findPrimesToLimit(a)
-    return hasDividerFromKnownPrimes(a)
+    find_primes_to_limit(a)
+    return has_divider_from_known_primes(a)
 
 
 cache_dividers = {}
@@ -78,7 +79,7 @@ def find_dividers(a, f=2, distinct=False):
     c = math.floor(a ** 0.5)
     if a < 2:
         return [a]
-    pp = findPrimesToLimit(a)
+    pp = find_primes_to_limit(a)
     for b in pp:
         if b < f:
             continue
@@ -239,7 +240,7 @@ def mult(l):
 def totient(n):
     if n < 2:
         return 1
-    # if isPrime(n):
+    # if is_prime(n):
     #     return n -1
     dd = find_dividers(n, distinct=True)
     phi = n
@@ -270,19 +271,19 @@ def make_primes_sieve_atkin(limit):
             y2 += 2 * j - 1
             n = 4 * x2 + y2
             if (n <= limit) and (n % 12 == 1 or n % 12 == 5):
-                print("\033[F\033[K", i, j, n, 'invert')
+                # print("\033[F\033[K", i, j, n, 'invert')
                 out[n] = not out[n] if n in out else True
 
             # n = 3 * x2 + y2
             n -= x2  # Optimization
             if (n <= limit) and (n % 12 == 7):
-                print("\033[F\033[K", i, j, n, 'invert')
+                # print("\033[F\033[K", i, j, n, 'invert')
                 out[n] = not out[n] if n in out else True
 
             # n = 3 * x2 - y2;
             n -= 2 * y2  # Optimization
             if (i > j) and (n <= limit) and (n % 12 == 11):
-                print("\033[F\033[K", i, j, n, 'invert')
+                # print("\033[F\033[K", i, j, n, 'invert')
                 out[n] = not out[n] if n in out else True
 
     # Отсеиваем кратные квадратам простых чисел в интервале [5, sqrt(limit)].
@@ -290,7 +291,7 @@ def make_primes_sieve_atkin(limit):
     for i in range(1, r):
         if i in out and out[i]:
             n = i * i
-            print("\033[F\033[K", n, 'is square')
+            # print("\033[F\033[K", n, 'is square')
         for j in range(n, limit + 1, n):
             out[j] = False
 
@@ -300,7 +301,7 @@ def make_primes_sieve_atkin(limit):
     for i in range(25, limit + 1, 5):
         out[i] = False
 
-    return tuple(x for x in out if out[x])
+    return dict((x, True) for x in out if out[x])
 
 
 class Fraction:
@@ -323,9 +324,17 @@ class Fraction:
 
 
 if __name__ == '__main__':
-    m = 0
-    for x in range(1, 10**6):
-        dd = find_composite_dividers(x)
-        if m < len(dd):
-            m = len(dd)
-            print(x, m, find_dividers(x), dd)
+
+    L = 1000000
+    aa = make_primes_sieve_atkin(L)
+    print(len(aa))
+    bb = find_primes_to_limit(L, explicit=True)
+    print(len(bb))
+    for a in aa:
+        # print(a)
+        if not is_prime(a):
+            raise AssertionError(a, 'is not prime')
+    for b in bb:
+        if b not in aa:
+            raise AssertionError(b, 'not found in atkin sieve')
+    print("all OK")

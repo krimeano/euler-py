@@ -13,7 +13,7 @@ def findLongestAForB(b):
         for a in aa:
             c = n * (n + a) + b
             #print(n, a, b, c)
-            if c > 1 and mylib.isPrime(c):
+            if c > 1 and mylib.is_prime(c):
                 aaa.append(a)
         if len(aaa):
             aaaa = aaa
@@ -23,7 +23,7 @@ def findLongestAForB(b):
 
 if __name__ == '__main__':
 
-    bb = mylib.findPrimesToLimit(1000, True)
+    bb = mylib.find_primes_to_limit(1000, True)
     r = {}
     for b in bb:
         r[b] = findLongestAForB(b)

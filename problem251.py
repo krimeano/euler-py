@@ -75,7 +75,7 @@ class CardanoTriplets():
             ak = 3 * bk - 1
             sq_d = self.get_square_dividers(ck)
             if ak + bk + ck > self.limit:
-                if mylib.isPrime(ck) and not len(sq_d):
+                if mylib.is_prime(ck) and not len(sq_d):
                     continue
             m0 = mylib.mult(sq_d)
             b0 = bk * m0

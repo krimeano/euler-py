@@ -28,7 +28,7 @@ def get_number_of_composite_dividers(a):
 
 k = 1
 for x in range(15, 10 ** 7, 2):
-    if mylib.isPrime(x):
+    if mylib.is_prime(x):
         continue
     c = get_number_of_composite_dividers(x - 1)
     d = get_number_of_composite_dividers(x)

@@ -6,7 +6,7 @@ import mylib
 
 
 def find_chains(p):
-    # mylib.isPrime()
+    # mylib.is_prime()
     out = []
     sp = str(p)
     search_digits = ['0', '1', '2']
@@ -17,7 +17,7 @@ def find_chains(p):
             # print(i, 'found in', p)
             for j in range(len(replace_digits)):
                 x = int(replace_digits[j].join(sp.split(search_digits[i])))
-                if mylib.isPrime(x):
+                if mylib.is_prime(x):
                     sub_out.append(x)
         if len(sub_out):
             out.append(sub_out)
@@ -25,7 +25,7 @@ def find_chains(p):
 
 
 def solve():
-    a = mylib.findPrimesToLimit(100000000)
+    a = mylib.find_primes_to_limit(100000000)
     for x in a:
         cc = find_chains(x)
         if len(cc):

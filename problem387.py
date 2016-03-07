@@ -30,7 +30,7 @@ class Harshad:
         self.digits = len(str(number))
         self.isHarshad = not self.number % self.digits
         self.isRightTruncatable = self.isHarshad and self._checkIsRightTruncatable()
-        self.isStrong = self.isHarshad and mylib.isPrime(self.number / self.digits)
+        self.isStrong = self.isHarshad and mylib.is_prime(self.number / self.digits)
         if Harshad.debug:
             print(self)
 
@@ -117,7 +117,7 @@ class Harshads:
             min_x = s * 10 + 1
             max_x = min_x + 9
             for x in range(min_x, max_x, 2):
-                if mylib.isPrime(x):
+                if mylib.is_prime(x):
                     Harshads.primes.append(x)
 
 

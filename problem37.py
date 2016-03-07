@@ -12,7 +12,7 @@ while len(complexPrimes[i]):
     for j in complexPrimes[i]:
         for k in myDigits:
             p = 10 * j + k
-            if mylib.isPrime(p):
+            if mylib.is_prime(p):
                 newComplexPrimes.append(p)
     complexPrimes.append(newComplexPrimes)
     #print(newComplexPrimes)
@@ -24,7 +24,7 @@ for pp in complexPrimes:
             continue
         q = int(str(p)[1:])
         while q:
-            if not mylib.isPrime(q):
+            if not mylib.is_prime(q):
                 break
             if q > 10:
                 q = int(str(q)[1:])

@@ -20,7 +20,7 @@ def solve():
 
     max_t = 1
     for x in range(59, 61):
-        # if mylib.isPrime(x):
+        # if mylib.is_prime(x):
         #     continue
         t = get_totient(x)
         max_t = max(t, max_t)

@@ -15,15 +15,15 @@ class PowerTriples:
         :return:
         """
         self.triples = set()
-        d_primes = mylib.findPrimesToLimit((self.limit - 12) ** (1 / 4), True)
+        d_primes = mylib.find_primes_to_limit((self.limit - 12) ** (1 / 4), True)
         # print(self.limit, d_primes)
         for d in d_primes:
             d4 = d ** 4
-            c_primes = mylib.findPrimesToLimit((self.limit - d4 - 4) ** (1 / 3), True)
+            c_primes = mylib.find_primes_to_limit((self.limit - d4 - 4) ** (1 / 3), True)
             # print(d, d4, c_primes)
             for c in c_primes:
                 c3 = c ** 3
-                b_primes = mylib.findPrimesToLimit((self.limit - d4 - c3) ** (1 / 2), True)
+                b_primes = mylib.find_primes_to_limit((self.limit - d4 - c3) ** (1 / 2), True)
                 # print(d, d4, c, c3, b_primes)
                 for b in b_primes:
                     b2 = b ** 2

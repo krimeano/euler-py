@@ -26,7 +26,7 @@ def solve():
         coil = coils.__next__()
         # print(coil)
         for x in coil:
-            if mylib.isPrime(x):
+            if mylib.is_prime(x):
                 numbers_prime.append(x)
             else:
                 numbers_complex.append(x)
