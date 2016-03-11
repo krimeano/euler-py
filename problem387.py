@@ -19,130 +19,90 @@ You are given that the sum of the strong, right truncatable Harshad primes less 
 
 Find the sum of the strong, right truncatable Harshad primes less than 10^14.
 """
-import mylib
+import math, mylib
 
 
 class Harshad:
-    debug = False
-
     def __init__(self, number):
-        self.number = number
-        self.digits = len(str(number))
-        self.isHarshad = not self.number % self.digits
-        self.isRightTruncatable = self.isHarshad and self._checkIsRightTruncatable()
-        self.isStrong = self.isHarshad and mylib.is_prime(self.number / self.digits)
-        if Harshad.debug:
-            print(self)
-
-    def _checkIsRightTruncatable(self):
-        x = self.number // 10
-        if x in Harshads.right:
-            return True
-        while x > 0:
-            h = Harshad(x)
-            if not h.isHarshad:
-                return False
-            x //= 10
-        return True
+        self.n = number
+        self.is_harshad = not self.n % len(str(self.n))
 
     def __str__(self):
-        return '<{number}:{isH}:{isT}:{isS}>' \
-            .format(number=self.number, digits=self.digits, isH=self.isHarshad, isT=self.isRightTruncatable,
-                    isS=self.isStrong)
+        return str(self.n)
+
+    def is_right(self):
+        return self.n < 10 or (self.is_harshad and Harshad(self.n // 10).is_harshad)
+
+    def is_strong(self):
+        return self.is_harshad and mylib.is_prime(self.n // len(str(self.n)))
 
 
-class Harshads:
-    harshads = []
-    not_harshads = []
-    right = []
-    right_strong = []
-    primes = []
+class Problem387:
+    hhh = [[], [1, 2, 3, 4, 5, 6, 7, 8, 9]]
+    ss = []
+    pp = dict()
+    rr = []
+
+    def make_right_harshads(self, p):
+        if len(self.hhh) < p:
+            self.make_right_harshads(p - 1)
+        gg = self.hhh[p - 1]
+        hh = []
+        for g in gg:
+            hh += self.gen_next_right_harshads(p, g)
+        self.hhh.append(hh)
+        return self
 
     @staticmethod
-    def append(n):
-        if n in Harshads.harshads:
-            return True
-        if n in Harshads.not_harshads:
-            return False
-        if n > 0 and not n % 1:
-            h = Harshad(n)
-            if h.isHarshad:
-                Harshads.harshads.append(n)
-                if h.isRightTruncatable:
-                    Harshads.right.append(n)
-                    if h.isStrong:
-                        Harshads.right_strong.append(n)
-                return True
-            else:
-                Harshads.not_harshads.append(n)
+    def gen_next_right_harshads(p, g):
+        out = []
+        n = 10 * g
+        r = n % p
+        if not r:
+            out.append(n)
+        out += [n + x for x in range(p - r, 10, p)]
+        print(p, g, out)
+        return out
+
+    def filter_strong(self):
+        for i in range(1, len(self.hhh)):
+            self.ss += [x for x in self.hhh[i] if (x // i) in self.pp]
+        return self
+
+    def make_primes(self):
+        self.rr = []
+        for x in self.ss:
+            for y in (1, 3, 7, 9):
+                r = 10 * x + y
+                if r in self.pp:
+                    # if mylib.is_prime(r):
+                    self.rr.append(r)
+                else:
+                    print(r, 'is not prime', mylib.find_dividers(r))
+        return self
+
+    def test(self):
+        p = 4
+        self.pp = mylib.make_primes_sieve_atkin(10 ** p)
+        self.make_right_harshads(p - 1).filter_strong().make_primes()
+        for hh in self.hhh:
+            print(hh)
+        print(self.ss)
+        print(sum(self.rr), 90619 - sum(self.rr), self.rr)
+        # h = Harshad(3608528850368400786036725)
+        # print(h, h.is_harshad, h.is_right())
+        # print(len(pp), sum(len(hh) for hh in self.hhh))
+        # print(pp)
+        # print(self.hhh)
         return False
 
-    @staticmethod
-    def seed(p):
-        for i in range(0, p):
-            min_x, max_x, step_x = Harshads.find_harshad_least(10 ** i), 10 ** (i + 1), i + 1
-            for x in range(min_x, max_x, step_x):
-                Harshads.append(x)
-
-    @staticmethod
-    def find_harshad_least(n):
-        if Harshads.append(n):
-            return n
-        else:
-            return Harshads.find_harshad_least(n + 1)
-
-    @staticmethod
-    def construct_right_harshads(p):
-        Harshads.seed(2)
-        if p < 3:
-            return
-        for i in range(2, p):
-            skip_x = 10 ** (i - 1)
-            min_x = 10 ** i
-            for x in Harshads.right:
-                if x < skip_x or x >= min_x:
-                    continue
-                min_y, max_y, step_y = Harshads.find_harshad_least(x * 10), (x + 1) * 10, i + 1
-                if min_y > max_y:
-                    continue
-                for y in range(min_y, max_y, step_y):
-                    Harshads.append(y)
-        return
-
-    @staticmethod
-    def find_primes(p):
-        Harshads.construct_right_harshads(p - 1)
-        print(Harshads.right_strong)
-        for s in Harshads.right_strong:
-            min_x = s * 10 + 1
-            max_x = min_x + 9
-            for x in range(min_x, max_x, 2):
-                if mylib.is_prime(x):
-                    Harshads.primes.append(x)
-
-
-def test():
-    # 54 54 100
-    # 204 354 1000
-    # 579 2604 10000
-    p = 4
-    # Harshad.debug = True
-    Harshads.find_primes(p)
-    print(Harshads.right[len(Harshads.right) - 1])
-    print(len(Harshads.right_strong), len(Harshads.right), len(Harshads.harshads), 10 ** p)
-    r = sum(Harshads.primes)
-    print(r, 90619 - r, Harshads.primes)
-
-    return r == 90619
-
-
-def solve():
-    r = 0
-    return r
+    def solve(self):
+        return 0
 
 
 if __name__ == '__main__':
-    if test():
-        print(solve())
+    problem = Problem387()
+    if problem.test():
+        print(problem.solve())
     else:
         print('not solved yet')
