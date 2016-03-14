@@ -66,19 +66,24 @@ class Problem387:
 
     def filter_strong(self):
         for i in range(1, len(self.hhh)):
-            self.ss += [x for x in self.hhh[i] if (x // i) in self.pp]
+            ss = [x for x in self.hhh[i] if (x // i) in self.pp]
+            print('primes', i, ss)
+            self.ss += ss
+            print('NOT primes', i, [x for x in self.hhh[i] if (x // i) not in self.pp])
         return self
 
     def make_primes(self):
         self.rr = []
         for x in self.ss:
+            print(x, ':')
             for y in (1, 3, 7, 9):
                 r = 10 * x + y
                 if r in self.pp:
                     # if mylib.is_prime(r):
+                    print('+', r, 'is prime')
                     self.rr.append(r)
                 else:
-                    print(r, 'is not prime', mylib.find_dividers(r))
+                    print('-', r, 'is NOT prime', mylib.find_dividers(r))
         return self
 
     def test(self):
