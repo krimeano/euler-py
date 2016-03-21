@@ -1,4 +1,4 @@
-import math, sys, io
+import math, sys, os
 
 known_primes = dict()
 
@@ -300,7 +300,7 @@ def make_primes_sieve_atkin(limit):
 
 
 # 00110101000101000101000100000101000001000101000100000100000101000001000101000001000100000100000001000
-def gen_file_primes_sieve_atkin(limit):
+def gen_file_primes_sieve_atkin(limit, path=''):
     def invert_number(_f, _n):
         _f.seek(_n)
         _v = f.read(1)
@@ -309,12 +309,17 @@ def gen_file_primes_sieve_atkin(limit):
 
     r = int(limit ** 0.5 // 1) + 1
     x2 = 0
-    with open('primes-to-' + str(limit) + '.txt', 'r+') as f:
+
+    path = path or 'primes-to-' + str(limit) + '.txt'
+    print("initial filling of the file = ", path)
+    with open(path, 'w') as f:
         for i in range(limit + 1):
             f.write('0')
         f.seek(2)
         f.write('11')  # 2 and 3
 
+    with open(path, 'r+') as f:
+        print("start searching for primes", "\n")
         for i in range(1, r):
             x2 += 2 * i - 1
             y2 = 0
@@ -322,16 +327,22 @@ def gen_file_primes_sieve_atkin(limit):
                 y2 += 2 * j - 1
                 n = 4 * x2 + y2
                 if (n <= limit) and (n % 12 == 1 or n % 12 == 5):
+                    print("\033[F\033[K", end="")
+                    print('invert', i, j, n)
                     invert_number(f, n)
 
                 # n = 3 * x2 + y2
                 n -= x2  # Optimization
                 if (n <= limit) and (n % 12 == 7):
+                    print("\033[F\033[K", end="")
+                    print('invert', i, j, n)
                     invert_number(f, n)
 
                 # n = 3 * x2 - y2;
                 n -= 2 * y2  # Optimization
                 if (i > j) and (n <= limit) and (n % 12 == 11):
+                    print("\033[F\033[K", end="")
+                    print('invert', n, i, j)
                     invert_number(f, n)
 
         for i in range(1, r):
@@ -339,9 +350,11 @@ def gen_file_primes_sieve_atkin(limit):
             v = f.read(1)
             if v == '1':
                 n = i * i
-            for j in range(n, limit + 1, n):
-                f.seek(n)
-                f.write('0')
+                print("\033[F\033[K", end="")
+                print('square', n)
+                for j in range(n, limit + 1, n):
+                    f.seek(n)
+                    f.write('0')
 
         for i in range(9, limit + 1, 3):
             f.seek(i)
@@ -350,8 +363,27 @@ def gen_file_primes_sieve_atkin(limit):
         for i in range(25, limit + 1, 5):
             f.seek(i)
             f.write('0')
-
+        print("start searching for primes")
+    print("finished storing to the file =", path, "\n")
     return
+
+
+def primes_from_file(limit):
+    path = 'primes-to-' + str(limit) + '.txt'
+    if not os.path.exists(path):
+        gen_file_primes_sieve_atkin(limit, path)
+    out = dict()
+    print("start reading of the file =", path)
+    with open(path, 'r') as f:
+        i = 0
+        v = f.read(1)
+        while v:
+            if v == '1':
+                out[i] = True
+            v = f.read(1)
+            i += 1
+    print("finish reading of the file =", path)
+    return out
 
 
 def prob_c(k, n):
@@ -405,4 +437,4 @@ class Fraction:
 
 
 if __name__ == '__main__':
-    gen_file_primes_sieve_atkin(100)
+    print(len(primes_from_file(10 ** 6)), "primes found")
