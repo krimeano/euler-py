@@ -1,4 +1,4 @@
-import math, sys
+import math, sys, io
 
 known_primes = dict()
 
@@ -299,6 +299,61 @@ def make_primes_sieve_atkin(limit):
     return dict((x, True) for x in out if out[x])
 
 
+# 00110101000101000101000100000101000001000101000100000100000101000001000101000001000100000100000001000
+def gen_file_primes_sieve_atkin(limit):
+    def invert_number(_f, _n):
+        _f.seek(_n)
+        _v = f.read(1)
+        _f.seek(_n)
+        _f.write('0' if _v == '1' else '1')
+
+    r = int(limit ** 0.5 // 1) + 1
+    x2 = 0
+    with open('primes-to-' + str(limit) + '.txt', 'r+') as f:
+        for i in range(limit + 1):
+            f.write('0')
+        f.seek(2)
+        f.write('11')  # 2 and 3
+
+        for i in range(1, r):
+            x2 += 2 * i - 1
+            y2 = 0
+            for j in range(1, r):
+                y2 += 2 * j - 1
+                n = 4 * x2 + y2
+                if (n <= limit) and (n % 12 == 1 or n % 12 == 5):
+                    invert_number(f, n)
+
+                # n = 3 * x2 + y2
+                n -= x2  # Optimization
+                if (n <= limit) and (n % 12 == 7):
+                    invert_number(f, n)
+
+                # n = 3 * x2 - y2;
+                n -= 2 * y2  # Optimization
+                if (i > j) and (n <= limit) and (n % 12 == 11):
+                    invert_number(f, n)
+
+        for i in range(1, r):
+            f.seek(i)
+            v = f.read(1)
+            if v == '1':
+                n = i * i
+            for j in range(n, limit + 1, n):
+                f.seek(n)
+                f.write('0')
+
+        for i in range(9, limit + 1, 3):
+            f.seek(i)
+            f.write('0')
+
+        for i in range(25, limit + 1, 5):
+            f.seek(i)
+            f.write('0')
+
+    return
+
+
 def prob_c(k, n):
     r = 1
     k1 = min(k, n - k)
@@ -350,7 +405,4 @@ class Fraction:
 
 
 if __name__ == '__main__':
-
-    for n in range(2, 11):
-        for k in range(1, n // 2 + 1):
-            print(k, n, prob_c(k, n))
+    gen_file_primes_sieve_atkin(100)
