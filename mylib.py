@@ -260,9 +260,6 @@ def make_primes_sieve_atkin(limit):
     out[3] = True
     r = int(limit ** 0.5 // 1) + 1
 
-    # Предположительно простые - это целые с нечетным числом
-    # представлений в данных квадратных формах.
-    # x2 и y2 - это квадраты i и j (оптимизация).
     x2 = 0
     for i in range(1, r):
         x2 += 2 * i - 1
@@ -271,27 +268,25 @@ def make_primes_sieve_atkin(limit):
             y2 += 2 * j - 1
             n = 4 * x2 + y2
             if (n <= limit) and (n % 12 == 1 or n % 12 == 5):
-                # print("\033[F\033[K", i, j, n, 'invert')
+                print("\033[F\033[K", i, j, n, 'invert')
                 out[n] = not out[n] if n in out else True
 
             # n = 3 * x2 + y2
             n -= x2  # Optimization
             if (n <= limit) and (n % 12 == 7):
-                # print("\033[F\033[K", i, j, n, 'invert')
+                print("\033[F\033[K", i, j, n, 'invert')
                 out[n] = not out[n] if n in out else True
 
             # n = 3 * x2 - y2;
             n -= 2 * y2  # Optimization
             if (i > j) and (n <= limit) and (n % 12 == 11):
-                # print("\033[F\033[K", i, j, n, 'invert')
+                print("\033[F\033[K", i, j, n, 'invert')
                 out[n] = not out[n] if n in out else True
 
-    # Отсеиваем кратные квадратам простых чисел в интервале [5, sqrt(limit)].
-    # (основной этап не может их отсеять)
     for i in range(1, r):
         if i in out and out[i]:
             n = i * i
-            # print("\033[F\033[K", n, 'is square')
+            print("\033[F\033[K", n, 'is square')
         for j in range(n, limit + 1, n):
             out[j] = False
 
@@ -302,6 +297,37 @@ def make_primes_sieve_atkin(limit):
         out[i] = False
 
     return dict((x, True) for x in out if out[x])
+
+
+def prob_c(k, n):
+    r = 1
+    k1 = min(k, n - k)
+    if k1 < 0:
+        return 0
+    for i in range(0, k1):
+        r *= n - i
+        r //= i + 1
+    return r
+
+
+cache_factorial = dict()
+
+
+def factorial(n):
+    if n <= 0:
+        return 1
+    if n not in cache_factorial:
+        cache_factorial[n] = n * factorial(n - 1)
+    return cache_factorial[n]
+
+
+def factorial_mod(n, p):
+    if n < 2:
+        return 1
+    out = 2
+    for x in range(3, n + 1):
+        out = (out * x) % p
+    return out
 
 
 class Fraction:
@@ -325,16 +351,6 @@ class Fraction:
 
 if __name__ == '__main__':
 
-    L = 1000000
-    aa = make_primes_sieve_atkin(L)
-    print(len(aa))
-    bb = find_primes_to_limit(L, explicit=True)
-    print(len(bb))
-    for a in aa:
-        # print(a)
-        if not is_prime(a):
-            raise AssertionError(a, 'is not prime')
-    for b in bb:
-        if b not in aa:
-            raise AssertionError(b, 'not found in atkin sieve')
-    print("all OK")
+    for n in range(2, 11):
+        for k in range(1, n // 2 + 1):
+            print(k, n, prob_c(k, n))
