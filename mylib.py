@@ -301,25 +301,42 @@ def make_primes_sieve_atkin(limit):
 
 # 00110101000101000101000100000101000001000101000100000100000101000001000101000001000100000100000001000
 def gen_file_primes_sieve_atkin(limit, path=''):
+    limit = math.ceil(limit / 8) * 8
+
+    def read_bit(_f, _n):
+        _f.seek(_n // 8)
+        return ord(f.read(1)) & (2 ** (7 - _n % 8))
+
+    def write_bit(_f, _n, _v):
+        _b = _n // 8
+        _mask = 2 ** (7 - _n % 8)
+        _f.seek(_b)
+        _vb = ord(f.read(1))
+        if _v:
+            _vb |= _mask
+        else:
+            _vb &= 0b11111111 - _mask
+        _f.seek(_b)
+        _f.write(chr(_vb))
+        return
+
     def invert_number(_f, _n):
-        _f.seek(_n)
-        _v = f.read(1)
-        _f.seek(_n)
-        _f.write('0' if _v == '1' else '1')
+        write_bit(_f, _n, 1 - read_bit(_f, _n))
 
     r = int(limit ** 0.5 // 1) + 1
     x2 = 0
+    print(limit, r)
 
     path = path or 'primes-to-' + str(limit) + '.txt'
     print("initial filling of the file = ", path)
     with open(path, 'w') as f:
-        for i in range(limit + 1):
-            f.write('0')
-        f.seek(2)
-        f.write('11')  # 2 and 3
+        for i in range(limit // 8):
+            f.write(chr(0))
 
     with open(path, 'r+') as f:
         print("start searching for primes", "\n")
+        write_bit(f, 2, 1)
+        write_bit(f, 3, 1)
         for i in range(1, r):
             x2 += 2 * i - 1
             y2 = 0
@@ -353,35 +370,47 @@ def gen_file_primes_sieve_atkin(limit, path=''):
                 print("\033[F\033[K", end="")
                 print('square', n)
                 for j in range(n, limit + 1, n):
-                    f.seek(n)
-                    f.write('0')
+                    write_bit(f, n, 0)
 
         for i in range(9, limit + 1, 3):
-            f.seek(i)
-            f.write('0')
+            print("\033[F\033[K", end="")
+            print("remove 9x", i)
+            write_bit(f, i, 0)
 
         for i in range(25, limit + 1, 5):
-            f.seek(i)
-            f.write('0')
-        print("start searching for primes")
+            print("\033[F\033[K", end="")
+            print("remove 25x", i)
+            write_bit(f, i, 0)
+        print("finish searching for primes")
     print("finished storing to the file =", path, "\n")
+    # with open(path, 'r+') as f:
+    #     f.seek(0)
+    #     print([ord(x) for x in f.read()])
+
     return
 
 
 def primes_from_file(limit):
+    limit = math.ceil(limit / 8) * 8
+
     path = 'primes-to-' + str(limit) + '.txt'
     if not os.path.exists(path):
         gen_file_primes_sieve_atkin(limit, path)
-    out = dict()
+    out = dict(((2, True), (3, True)))
     print("start reading of the file =", path)
     with open(path, 'r') as f:
-        i = 0
-        v = f.read(1)
-        while v:
-            if v == '1':
-                out[i] = True
-            v = f.read(1)
-            i += 1
+        n = 0
+        for x in f.read():
+            vb = ord(x)
+            print(vb)
+            mask = 2 ** 8
+            for bn in range(8):
+                mask //= 2
+                v = vb & mask
+                print(vb, mask, v)
+                if v:
+                    out[n] = True
+                n += 1
     print("finish reading of the file =", path)
     return out
 
@@ -437,4 +466,32 @@ class Fraction:
 
 
 if __name__ == '__main__':
-    print(len(primes_from_file(10 ** 6)), "primes found")
+    # gen_file_primes_sieve_atkin(10)
+    print(primes_from_file(10))
+    #
+    # ba = [
+    #     0b00110101,
+    #     0b00010100,
+    #     0b01010001,
+    #     0b00000101,
+    #     0b00000100,
+    #     0b01010001,
+    #     0b00000100,
+    #     0b00010100,
+    #     0b00010001,
+    #     0b01000001,
+    #     0b00010000,
+    #     0b01000000,
+    #     0b01000101
+    # ]
+    # print(ba)
+    # with open('_test_file.txt', 'w') as f:
+    #     for b in ba:
+    #         f.write(chr(b))
+    # s = os.stat('_test_file.txt').st_size
+    # print(os.path.getsize('_test_file.txt'), s)
+    # with open('_test_file.txt', 'r') as f:
+    #     for i in range(s):
+    #         b = f.read(1)
+    #         print(ord(b), end=" ")
+    # print()
