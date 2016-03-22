@@ -301,7 +301,7 @@ def make_primes_sieve_atkin(limit):
 
 # 00110101000101000101000100000101000001000101000100000100000101000001000101000001000100000100000001000
 def gen_file_primes_sieve_atkin(limit, path=''):
-    limit = math.ceil(limit / 8) * 8
+    limit = math.ceil(limit / 16) * 16
 
     def read_bit(_f, _n):
         _f.seek(_n // 8)
@@ -318,9 +318,10 @@ def gen_file_primes_sieve_atkin(limit, path=''):
             _vb &= 0b11111111 - _mask
         _f.seek(_b)
         _f.write(chr(_vb))
+        # print('<', _n, _vb)
         return
 
-    def invert_number(_f, _n):
+    def invert_bit(_f, _n):
         write_bit(_f, _n, 1 - read_bit(_f, _n))
 
     r = int(limit ** 0.5 // 1) + 1
@@ -330,13 +331,12 @@ def gen_file_primes_sieve_atkin(limit, path=''):
     path = path or 'primes-to-' + str(limit) + '.txt'
     print("initial filling of the file = ", path)
     with open(path, 'w') as f:
-        for i in range(limit // 8):
+        for i in range(limit // 16):
             f.write(chr(0))
 
     with open(path, 'r+') as f:
         print("start searching for primes", "\n")
-        write_bit(f, 2, 1)
-        write_bit(f, 3, 1)
+        write_bit(f, 3 // 2, 1)
         for i in range(1, r):
             x2 += 2 * i - 1
             y2 = 0
@@ -346,21 +346,21 @@ def gen_file_primes_sieve_atkin(limit, path=''):
                 if (n <= limit) and (n % 12 == 1 or n % 12 == 5):
                     print("\033[F\033[K", end="")
                     print('invert', i, j, n)
-                    invert_number(f, n)
+                    invert_bit(f, n // 2)
 
                 # n = 3 * x2 + y2
                 n -= x2  # Optimization
                 if (n <= limit) and (n % 12 == 7):
                     print("\033[F\033[K", end="")
                     print('invert', i, j, n)
-                    invert_number(f, n)
+                    invert_bit(f, n // 2)
 
                 # n = 3 * x2 - y2;
                 n -= 2 * y2  # Optimization
                 if (i > j) and (n <= limit) and (n % 12 == 11):
                     print("\033[F\033[K", end="")
-                    print('invert', n, i, j)
-                    invert_number(f, n)
+                    print('invert', i, j, n)
+                    invert_bit(f, n // 2)
 
         for i in range(1, r):
             f.seek(i)
@@ -370,17 +370,17 @@ def gen_file_primes_sieve_atkin(limit, path=''):
                 print("\033[F\033[K", end="")
                 print('square', n)
                 for j in range(n, limit + 1, n):
-                    write_bit(f, n, 0)
+                    write_bit(f, n // 2, 0)
 
-        for i in range(9, limit + 1, 3):
+        for i in range(9, limit + 1, 6):
             print("\033[F\033[K", end="")
-            print("remove 9x", i)
-            write_bit(f, i, 0)
+            print("remove 3x", i)
+            write_bit(f, i // 2, 0)
 
-        for i in range(25, limit + 1, 5):
+        for i in range(25, limit + 1, 10):
             print("\033[F\033[K", end="")
-            print("remove 25x", i)
-            write_bit(f, i, 0)
+            print("remove 5x", i)
+            write_bit(f, i // 2, 0)
         print("finish searching for primes")
     print("finished storing to the file =", path, "\n")
     # with open(path, 'r+') as f:
@@ -391,15 +391,15 @@ def gen_file_primes_sieve_atkin(limit, path=''):
 
 
 def primes_from_file(limit):
-    limit = math.ceil(limit / 8) * 8
+    limit = math.ceil(limit / 16) * 16
 
     path = 'primes-to-' + str(limit) + '.txt'
     if not os.path.exists(path):
         gen_file_primes_sieve_atkin(limit, path)
-    out = dict(((2, True), (3, True)))
+    out = dict(((2, True),))
     print("start reading of the file =", path)
     with open(path, 'r') as f:
-        n = 0
+        n = 1
         for x in f.read():
             vb = ord(x)
             print(vb)
@@ -407,10 +407,10 @@ def primes_from_file(limit):
             for bn in range(8):
                 mask //= 2
                 v = vb & mask
-                print(vb, mask, v)
+                # print(vb, mask, v)
                 if v:
                     out[n] = True
-                n += 1
+                n += 2
     print("finish reading of the file =", path)
     return out
 
@@ -466,32 +466,4 @@ class Fraction:
 
 
 if __name__ == '__main__':
-    # gen_file_primes_sieve_atkin(10)
-    print(primes_from_file(100))
-    #
-    # ba = [
-    #     0b00110101,
-    #     0b00010100,
-    #     0b01010001,
-    #     0b00000101,
-    #     0b00000100,
-    #     0b01010001,
-    #     0b00000100,
-    #     0b00010100,
-    #     0b00010001,
-    #     0b01000001,
-    #     0b00010000,
-    #     0b01000000,
-    #     0b01000101
-    # ]
-    # print(ba)
-    # with open('_test_file.txt', 'w') as f:
-    #     for b in ba:
-    #         f.write(chr(b))
-    # s = os.stat('_test_file.txt').st_size
-    # print(os.path.getsize('_test_file.txt'), s)
-    # with open('_test_file.txt', 'r') as f:
-    #     for i in range(s):
-    #         b = f.read(1)
-    #         print(ord(b), end=" ")
-    # print()
+    print(len(make_primes_sieve_atkin(10**9)), 'primes')
