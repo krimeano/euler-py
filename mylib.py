@@ -467,7 +467,7 @@ class Fraction:
 
 if __name__ == '__main__':
     # gen_file_primes_sieve_atkin(10)
-    print(primes_from_file(10))
+    print(primes_from_file(100))
     #
     # ba = [
     #     0b00110101,
