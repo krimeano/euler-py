@@ -249,17 +249,18 @@ def totient(n):
     return int(phi)
 
 
-def make_primes_sieve_atkin(limit):
+def make_primes_sieve_atkin(limit, return_arr=False):
     """
     https://ru.wikipedia.org/wiki/%D0%A0%D0%B5%D1%88%D0%B5%D1%82%D0%BE_%D0%90%D1%82%D0%BA%D0%B8%D0%BD%D0%B0
     :param limit:
+    :param return_arr:
     :return:
     """
-    out = {}
-    out[2] = True
-    out[3] = True
+    print("Filling list, L=", limit // 2)
+    out = [0] * (limit // 2)
+    out[1] = 1
     r = int(limit ** 0.5 // 1) + 1
-
+    print("List is filled")
     x2 = 0
     for i in range(1, r):
         x2 += 2 * i - 1
@@ -268,145 +269,76 @@ def make_primes_sieve_atkin(limit):
             y2 += 2 * j - 1
             n = 4 * x2 + y2
             if (n <= limit) and (n % 12 == 1 or n % 12 == 5):
-                print("\033[F\033[K", i, j, n, 'invert')
-                out[n] = not out[n] if n in out else True
+                print("\033[F\033[K", i, j, n, 'invert 5')
+                out[n // 2] = 1 - out[n // 2]
 
             # n = 3 * x2 + y2
             n -= x2  # Optimization
             if (n <= limit) and (n % 12 == 7):
-                print("\033[F\033[K", i, j, n, 'invert')
-                out[n] = not out[n] if n in out else True
+                print("\033[F\033[K", i, j, n, 'invert 4')
+                out[n // 2] = 1 - out[n // 2]
 
             # n = 3 * x2 - y2;
             n -= 2 * y2  # Optimization
             if (i > j) and (n <= limit) and (n % 12 == 11):
-                print("\033[F\033[K", i, j, n, 'invert')
-                out[n] = not out[n] if n in out else True
+                print("\033[F\033[K", i, j, n, 'invert 2')
+                out[n // 2] = 1 - out[n // 2]
 
-    for i in range(1, r):
-        if i in out and out[i]:
+    for i in range(1, r, 2):
+        if out[i // 2]:
             n = i * i
             print("\033[F\033[K", n, 'is square')
-        for j in range(n, limit + 1, n):
-            out[j] = False
+            for j in range(n, limit + 1, 2 * n):
+                out[j // 2] = 0
 
-    for i in range(9, limit + 1, 3):
-        out[i] = False
+    for i in range(9, limit + 1, 6):
+        print("\033[F\033[K", i, 'is 3x')
+        out[i // 2] = 0
 
-    for i in range(25, limit + 1, 5):
-        out[i] = False
-
-    return dict((x, True) for x in out if out[x])
+    for i in range(25, limit + 1, 10):
+        print("\033[F\033[K", i, 'is 5x')
+        out[i // 2] = 0
+    if not return_arr:
+        out = dict((i * 2 + 1, True) for i in range(len(out)) if out[i] if i)
+        out.update({2: True})
+    return out
 
 
 # 00110101000101000101000100000101000001000101000100000100000101000001000101000001000100000100000001000
 def gen_file_primes_sieve_atkin(limit, path=''):
     limit = math.ceil(limit / 16) * 16
+    pp = make_primes_sieve_atkin(limit, True)
+    bb = []
+    if len(pp) % 8:
+        raise AssertionError('limit should be 16x')
+    # print("\033[F\033[K", len(pp) // 8, 'bytes to store')
+    chunks = [pp[x:x + 8] for x in range(0, len(pp), 8)]
 
-    def read_bit(_f, _n):
-        _f.seek(_n // 8)
-        return ord(f.read(1)) & (2 ** (7 - _n % 8))
-
-    def write_bit(_f, _n, _v):
-        _b = _n // 8
-        _mask = 2 ** (7 - _n % 8)
-        _f.seek(_b)
-        _vb = ord(f.read(1))
-        if _v:
-            _vb |= _mask
-        else:
-            _vb &= 0b11111111 - _mask
-        _f.seek(_b)
-        _f.write(chr(_vb))
-        # print('<', _n, _vb)
-        return
-
-    def invert_bit(_f, _n):
-        write_bit(_f, _n, 1 - read_bit(_f, _n))
-
-    r = int(limit ** 0.5 // 1) + 1
-    x2 = 0
-    print(limit, r)
-
-    path = path or 'primes-to-' + str(limit) + '.txt'
-    print("initial filling of the file = ", path)
-    with open(path, 'w') as f:
-        for i in range(limit // 16):
-            f.write(chr(0))
-
-    with open(path, 'r+') as f:
-        print("start searching for primes", "\n")
-        write_bit(f, 3 // 2, 1)
-        for i in range(1, r):
-            x2 += 2 * i - 1
-            y2 = 0
-            for j in range(1, r):
-                y2 += 2 * j - 1
-                n = 4 * x2 + y2
-                if (n <= limit) and (n % 12 == 1 or n % 12 == 5):
-                    print("\033[F\033[K", end="")
-                    print('invert', i, j, n)
-                    invert_bit(f, n // 2)
-
-                # n = 3 * x2 + y2
-                n -= x2  # Optimization
-                if (n <= limit) and (n % 12 == 7):
-                    print("\033[F\033[K", end="")
-                    print('invert', i, j, n)
-                    invert_bit(f, n // 2)
-
-                # n = 3 * x2 - y2;
-                n -= 2 * y2  # Optimization
-                if (i > j) and (n <= limit) and (n % 12 == 11):
-                    print("\033[F\033[K", end="")
-                    print('invert', i, j, n)
-                    invert_bit(f, n // 2)
-
-        for i in range(1, r):
-            f.seek(i)
-            v = f.read(1)
-            if v == '1':
-                n = i * i
-                print("\033[F\033[K", end="")
-                print('square', n)
-                for j in range(n, limit + 1, n):
-                    write_bit(f, n // 2, 0)
-
-        for i in range(9, limit + 1, 6):
-            print("\033[F\033[K", end="")
-            print("remove 3x", i)
-            write_bit(f, i // 2, 0)
-
-        for i in range(25, limit + 1, 10):
-            print("\033[F\033[K", end="")
-            print("remove 5x", i)
-            write_bit(f, i // 2, 0)
-        print("finish searching for primes")
-    print("finished storing to the file =", path, "\n")
-    # with open(path, 'r+') as f:
-    #     f.seek(0)
-    #     print([ord(x) for x in f.read()])
-
+    powers_2 = tuple(2 ** (x - 1) for x in range(8, 0, -1))
+    for chunk in chunks:
+        b = sum(powers_2[i] for i in range(8) if chunk[i])
+        bb.append(b)
+    path = path or 'primes-to-' + str(limit) + '.bin'
+    with open(path, 'wb') as f:
+        f.write(bytes(bb))
     return
 
 
 def primes_from_file(limit):
     limit = math.ceil(limit / 16) * 16
 
-    path = 'primes-to-' + str(limit) + '.txt'
+    path = 'primes-to-' + str(limit) + '.bin'
     if not os.path.exists(path):
         gen_file_primes_sieve_atkin(limit, path)
     out = dict(((2, True),))
     print("start reading of the file =", path)
-    with open(path, 'r') as f:
+    with open(path, 'rb') as f:
         n = 1
         for x in f.read():
-            vb = ord(x)
-            print(vb)
             mask = 2 ** 8
             for bn in range(8):
                 mask //= 2
-                v = vb & mask
+                v = x & mask
                 # print(vb, mask, v)
                 if v:
                     out[n] = True
@@ -466,4 +398,4 @@ class Fraction:
 
 
 if __name__ == '__main__':
-    print(len(make_primes_sieve_atkin(10**9)), 'primes')
+    print(sorted(primes_from_file(10 ** 8))[-10:])
