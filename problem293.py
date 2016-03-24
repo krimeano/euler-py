@@ -1,59 +1,66 @@
-import mylib, math
+"""
+An even positive integer N will be called admissible, if it is a power of 2
+or its distinct prime factors are consecutive primes.
+The first twelve admissible numbers are 2,4,6,8,12,16,18,24,30,32,36,48.
+
+If N is admissible, the smallest integer M > 1 such that N+M is prime, will be called the pseudo-Fortunate number for N.
+
+For example, N=630 is admissible since it is even and its distinct prime factors are the consecutive primes 2,3,5 and 7.
+The next prime number after 631 is 641; hence, the pseudo-Fortunate number for 630 is M=11.
+It can also be seen that the pseudo-Fortunate number for 16 is 3.
+
+Find the sum of all distinct pseudo-Fortunate numbers for admissible numbers N less than 10**9.
+"""
+
+import math
+import mylib
 
 top = 10 ** 9
-pp = mylib.make_primes_sieve_atkin(int(top + 100))
 
-top_r = math.floor(top ** .5)
-top_half = top // 2
+pp_100 = sorted(mylib.primes_from_file(100))
+bb = []
+m = 1
+for x in pp_100:
+    m *= x
+    if m >= top:
+        m //= x
+        break
+    bb.append(x)
+print(bb, m)
 
-bb = mylib.make_primes_sieve_atkin(top_r)
-bb = mylib.make_primes_sieve_atkin(math.floor(top / max(bb)))
-
-qq = sorted(pp)
-bb_sorted = sorted(bb)
-w = math.floor(math.log(top, 2))
-rrr = [[2 ** x for x in range(1, w + 1)]]
-print(rrr)
-to_remove = set()
-for b in sorted(bb):
-    if b < 3:
-        continue
-    w = math.floor(math.log(top, b))
-    mm = [1] + rrr[-1]
-    nn = [b ** x for x in range(1, w + 1)]
-    to_remove |= set(nn)
+rrr = [[1]]
+for b in bb:
+    mm = sorted(rrr[len(rrr) - 1])
+    p = math.floor(math.log(top, b))
+    nn = [b ** (x + 1) for x in range(p)]
     rr = []
     for m in mm:
         for n in nn:
             r = m * n
-            if r > top:
+            if r >= top:
                 break
             rr.append(r)
-    rrr.append(sorted(rr))
-    print("\033[F\033[K", end="")
-    print(b, w)
-aa = set()
-for rr in rrr:
-    aa |= set(rr)
+    rrr.append(rr)
 
-aa ^= to_remove
-# 2,4,6,8,12,16,18,24,30,32,36,48...
-print(sorted(aa))
-# print(sorted(to_remove))
-j_max = len(qq)
-j_min = 0
-ff = []
+aa = []
+
+for rr in rrr[1:]:
+    aa += rr
+aa = sorted(aa)
+print(aa[-10:])
+pp = sorted(mylib.primes_from_file(top))
 print()
-for a in sorted(aa):
-    for j in range(j_min + 1, j_max + 1):
-        q = qq[j]
-        if q < a:
-            j_min = j
-            continue
-        f = q - a
+i_max = len(pp)
+i_min = 0
+ff = []
+for a in aa:
+    for i in range(i_min, i_max):
+        p = pp[i]
+        f = p - a
+        print("\033[F\033[K", a, p, f)
         if f > 1:
-            print("\033[F\033[K", end="")
-            print(a, q, f)
+            print("\033[F\033[K", a, p, f)
             ff.append(f)
             break
+        i_min = i - 1
 print(sum(ff))

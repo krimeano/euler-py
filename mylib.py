@@ -398,4 +398,9 @@ class Fraction:
 
 
 if __name__ == '__main__':
-    print(sorted(primes_from_file(10 ** 8))[-10:])
+    # pp = find_primes_to_limit(100000, True)
+    # qq = primes_from_file(100000)
+    # print(len(pp), len(qq))
+    # print(sorted(pp)[-10:])
+    # print(sorted(qq)[-10:])
+    print(find_dividers(999398400))
