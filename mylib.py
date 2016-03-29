@@ -397,10 +397,29 @@ class Fraction:
         return p
 
 
+class Dices:
+    cache = dict()
+
+    @staticmethod
+    def calc_outs_next_dice(dice, outs=(1,)):
+        affix = (0,) * dice
+        outs = affix + outs + affix
+        new_outs = tuple(sum(outs[i + j] / dice or 0 for j in range(dice)) for i in range(len(outs) - dice + 1))
+        return new_outs
+
+    @staticmethod
+    def get_outs(dice, dices):
+        outs = (1,)
+        for i in range(dices):
+            key = str(dice) + 'x' + str(i)
+            if key in Dices.cache:
+                outs = tuple(Dices.cache[key][:])
+            else:
+                outs = Dices.calc_outs_next_dice(dice, outs)
+                print("\033[F\033[K", dice, "x", i+1,  sum(outs))
+                Dices.cache[key] = outs
+        return outs
+
+
 if __name__ == '__main__':
-    # pp = find_primes_to_limit(100000, True)
-    # qq = primes_from_file(100000)
-    # print(len(pp), len(qq))
-    # print(sorted(pp)[-10:])
-    # print(sorted(qq)[-10:])
-    print(find_dividers(999398400))
+    print(Dices.get_outs(20, 12))
