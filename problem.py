@@ -1,79 +1,85 @@
+"""
+It is easily proved that no equilateral triangle exists with integral length sides and integral area.
+However, the almost equilateral triangle 5-5-6 has an area of 12 square units.
+
+We shall define an almost equilateral triangle to be a triangle
+for which two sides are equal and the third differs by no more than one unit.
+
+Find the sum of the perimeters of all almost equilateral triangles with integral side lengths
+and area and whose perimeters do not exceed one billion (1,000,000,000).
+
+2 pythagorean triangles (a, b, c) --> triangle (c, c, 2a), (c, c, 2b)
+
+S = ab
+p = 2a+c, 2b+c
+
+2a = c ± 1,
+2b = c ± 1
+
+a = m2 - n2
+b = 2mn
+c = m2 + n2
+
+a) 2a = 2m2 - 2n2 = m2 + n2 ±1
+m2 = 3n2 ± 1
+m = 3x ± 1  -->
+m2 = 9x2 ± 6x + 1 = 3n2 ± 1 => m2 = 3n2 + 1 => 2a = c + 1
+a = 3n2 + 1 - n2 = 2n2 + 1
+b = 2 * sqrt(3n2 + 1) * n
+c = 3n2 + 1 + n2 = 4n2 + 1
+S = ab = 2n * (2n2 + 1) *  sqrt(3n2 + 1)  lil more than 4*sqrt(3) * n4
+P = 2a + 2c = 2m2 - 2n2 + 2m2 + 2n2 = 4m2 = 12n2 + 4
+max n = (L / 4 / sqrt(3)) ** 0.25
+
+b) 2b = 4mn = m2 + n2 ± 1
+m2 - 4mn + n2 ± 1 = 0
+D / 4 = 4n2 - n2 ± 1 = 3n2 ± 1 = 3n2 + 1 = k2
+
+m = 2n ± sqrt(3n2 + 1)
+m > n -> 2n - sqrt(3n2 + 1) > n -> n > sqrt(3n2 + 1) -> n2 > 3n2 + 1 - impossible
+=> m = 2n + sqrt(3n2 + 1) = 2n + k
+m2 = 7n2 + 4nk + 1
+a = m2 - n2 = 6n2 + 4nk + 1
+b = 2n(2n + k) = 4n2 + 2nk
+c = 8n2 + 4nk + 1
+P = 2b + 2c = 8n2 + 4nk + 16n2 + 8nk + 2 = 24n2 + 12nk + 2  lil more than 12*(2 + sqrt(3))*n2
+S = ab = (6n2 + 4nk + 1) * (4n2 + 2nk) = 24n4 + 16n3*k + 4n2 + 12n3 * k + 8n2(3n2+1) + 2nk
+= 48n4 + 28kn3 + 12n2 + 2nk   lil more than 4n4 * (12 + 7 * sqrt((3)
+
+"""
 import math
+import mylib
 
+L = 1000000000
+r = math.floor((L / 12) ** (1 / 2))
+print(r)
 
-def find_k_by_n(n):
-    def f(a):
-        return math.log(a + 1) * n
+s = 0
+for n in range(1, r + 1):
+    n2 = n ** 2
+    m2 = 3 * n2 + 1
+    m = round(m2 ** .5)
+    if m ** 2 != m2:
+        continue
+    w = 2 * n + m
+    w2 = w ** 2
+    print(n, n2, m2, w2, mylib.find_gcd(m, n), mylib.find_gcd(w, n))
 
-    return f
+    a = m2 - n2
+    b = 2 * m * n
+    c = m2 + n2
 
+    x = w2 - n2
+    y = 2 * w * n
+    z = w2 + n2
 
-def func_n(n):
-    def f(k):
-        return math.e ** (k / n) - 1
+    pc = 2 * (a + c)
+    if pc <= L:
+        s += pc
+    pz = 2 * (y + z)
 
-    return f
+    if pz <= L:
+        s += pz
+    print((a, b, c,), pc, (x, y, z,), pz)
 
-
-def approximate(n=200):
-    find_k = find_k_by_n(n)
-    func = func_n(n)
-    a = math.pi
-    kk = []
-    for i in range(3):
-        k = math.floor(find_k(a))
-        # print(a, k)
-        kk.append(k)
-        a -= func(k)
-    k = round(find_k(a))
-    kk.append(k)
-    return tuple(kk)
-
-
-def almost_pi_by_n(kk, n):
-    func = func_n(n)
-    s = 0
-    for k in kk:
-        s += func(k)
-    return s
-
-
-given_pi_200 = almost_pi_by_n((6, 75, 89, 226,), 200)
-my_pi_200 = almost_pi_by_n(approximate(200), 200)
-
-print(math.pi)
-
-print(given_pi_200, abs(math.pi - given_pi_200))
-print(my_pi_200, abs(math.pi - my_pi_200))
-
-n = 10000
-find_k = find_k_by_n(n)
-func = func_n(n)
-min_d = math.floor(find_k(math.pi / 4))
-max_d = math.floor(find_k(math.pi))
-r = 1
-rr = (0, 0, 0, 0)
-print(min_d, max_d, "\n")
-for d in range(min_d, max_d + 1):
-    f_d = func(d)
-    diff_d = math.pi - f_d
-    min_c = math.floor(find_k(diff_d / 3))
-    max_c = min(d, math.floor(find_k(diff_d)))
-    for c in range(min_c, max_c + 1):
-        f_c = func(c)
-        diff_c = diff_d - f_c
-        min_b = math.floor(find_k(diff_c / 2))
-        max_b = min(c, math.floor(find_k(diff_c)))
-        for b in range(min_b, max_b + 1):
-            f_b = func(b)
-            diff_b = diff_c - f_b
-            a = round(find_k(diff_b))
-            f_a = func(a)
-            f_pi = f_a + f_b + f_c + f_d
-            pi_diff = abs(math.pi - f_pi)
-            print("\033[F\033[K", d, c, b, a, f_pi, pi_diff)
-            if pi_diff < r:
-                print()
-                r = pi_diff
-                rr = (a, b, c, d)
-print(rr, sum(x ** 2 for x in rr))
+print(s)
