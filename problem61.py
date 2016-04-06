@@ -25,16 +25,6 @@ class PolyNumber:
         return ((b ** 2 + 4 * a * N) ** 0.5 - b) / (2 * a)
 
 
-def make_chain(current_chains, nnn):
-    if not len(nnn):
-        return current_chains
-    chains = []
-    for i in range(len(nnn)):
-        nnn_rest = nnn[:i] + nnn[i + 1:]
-
-    return chains
-
-
 def make_chains(old_chains, nnn):
     chains = dict()
     for ii in old_chains:
@@ -49,8 +39,8 @@ def make_chains(old_chains, nnn):
                 for n in nnn[j]:
                     if m % 100 == n // 100 and n not in mm:
                         cc.append(mm + [n])
-            if not len(cc): continue
-            # print(kk, len(cc), cc)
+            if not len(cc):
+                continue
             chains[kk] = cc
     return chains
 
@@ -64,24 +54,23 @@ def solve():
         nn = [z for z in [int(PolyNumber(x, y)) for y in range(f, t)] if z % 100 and (z % 100) // 10]
         nnn.append(nn)
     aaa[(0,)] = [[n] for n in nnn[0]]
-    bbb = make_chains(aaa, nnn)  # L=2
-    ccc = make_chains(bbb, nnn)  # L=3
-    ddd = make_chains(ccc, nnn)  # L=4
-    eee = make_chains(ddd, nnn)  # L=5
-    fff = make_chains(eee, nnn)  # L=6
 
+    fff = aaa
+    bbb = make_chains(aaa, nnn)
+    while len(bbb):
+        fff = bbb
+        bbb = make_chains(bbb, nnn)
+    r = 0
     for ii in fff:
         for ff in fff[ii]:
             m = ff[len(ff) - 1]
             n = ff[0]
-            if m % 100 != n // 100: continue
-            print(ii, ff, sum(ff))
+            if m % 100 != n // 100:
+                continue
+            print(ii, ff)
+            r = sum(ff)
 
-    # for gg in ggg[ii]:
-    #         # if gg[0] != gg[len(gg) - 1]:
-    #         #     continue
-    #         print(ii, gg)
-    return 0
+    return r
 
 
 if __name__ == '__main__':
