@@ -17,14 +17,14 @@ def ww_to_n(w_list):
 
 m = 0
 s = 2 * 3 * 5 * 7
-for n in range(s, 180181, s):
+for n in range(s, 1000, s):
     if mylib.is_prime(n):
         continue
     pd = mylib.find_dividers(n)
     if len(pd) < 4:
         continue
     dd = mylib.find_composite_dividers(n)
-    # print(n, len(dd), dd)
+    print(n, len(dd), dd)
     ss = set()
     for a in dd:
         for b in dd:
@@ -35,7 +35,7 @@ for n in range(s, 180181, s):
             z = a + b
             x = round(n * z / b)
             y = round(n / a) * z
-            # print(a, b, x, y, x * y / (x + y))
+            print(a, b, x, y, x * y / (x + y))
             ss.add((min(x, y), max(x, y, )))
 
     sl = len(ss)
