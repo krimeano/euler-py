@@ -30,20 +30,57 @@ def make_chain(current_chains, nnn):
         return current_chains
     chains = []
     for i in range(len(nnn)):
-        nnn_rest = nnn[:i] + nnn[i+1:]
+        nnn_rest = nnn[:i] + nnn[i + 1:]
 
     return chains
 
+
+def make_chains(old_chains, nnn):
+    chains = dict()
+    for ii in old_chains:
+        for j in range(len(nnn)):
+
+            if j in ii:
+                continue
+            kk = ii + (j,)
+            cc = []
+            for mm in old_chains[ii]:
+                m = mm[len(mm) - 1]
+                for n in nnn[j]:
+                    if m % 100 == n // 100 and n not in mm:
+                        cc.append(mm + [n])
+            if not len(cc): continue
+            # print(kk, len(cc), cc)
+            chains[kk] = cc
+    return chains
+
+
 def solve():
     nnn = []
+    aaa = dict()  # L=1
     for x in range(3, 9):
         f = math.ceil(PolyNumber.find_n(x, 1000))
         t = math.ceil(PolyNumber.find_n(x, 9999))
-        nn = [int(PolyNumber(x, y)) for y in range(f, t)]
-        #print(x, nn)
+        nn = [z for z in [int(PolyNumber(x, y)) for y in range(f, t)] if z % 100 and (z % 100) // 10]
         nnn.append(nn)
-    chain = make_chain([], nnn)
-    print(chain)
+    aaa[(0,)] = [[n] for n in nnn[0]]
+    bbb = make_chains(aaa, nnn)  # L=2
+    ccc = make_chains(bbb, nnn)  # L=3
+    ddd = make_chains(ccc, nnn)  # L=4
+    eee = make_chains(ddd, nnn)  # L=5
+    fff = make_chains(eee, nnn)  # L=6
+
+    for ii in fff:
+        for ff in fff[ii]:
+            m = ff[len(ff) - 1]
+            n = ff[0]
+            if m % 100 != n // 100: continue
+            print(ii, ff, sum(ff))
+
+    # for gg in ggg[ii]:
+    #         # if gg[0] != gg[len(gg) - 1]:
+    #         #     continue
+    #         print(ii, gg)
     return 0
 
 
