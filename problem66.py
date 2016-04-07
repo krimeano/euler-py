@@ -1,4 +1,7 @@
-import math
+import math, fractions
+
+ss = dict((x ** 2, True) for x in range(math.ceil(1000 ** 0.5)))
+print(ss)
 
 
 class Diophantine:
@@ -25,20 +28,34 @@ class Diophantine:
 
 class Problem66:
     @staticmethod
+    def check(d, x, y):
+        return not (x * x - d * y * y - 1)
+
+    @staticmethod
     def find_max_x(d_max=1):
         max_x = 0
+        r = 0
         for d in range(1, d_max):
-            dio = Diophantine(d)
-            s = dio.find_minimal_x_solution()
-            print(d, s)
-            max_x = max(max_x, s[0])
-        return max_x
+            if d in ss:
+                continue
+            q = fractions.SquareRootFraction(d)
+            k = 1
+            a = q.get_approximation(1)
+            print(d, '[', k, ']', a.n, '** 2 -', d, '*', a.d, '** 2 =', a.n ** 2 - d * a.d ** 2)
+            while not Problem66.check(d, a.n, a.d):
+                k += 2
+                a = q.get_approximation(k)
+                print('    [', k, ']', a.n, '** 2 -', d, '*', a.d, '** 2 =', a.n ** 2 - d * a.d ** 2)
+            if a.n > max_x:
+                max_x = a.n
+                r = d
+        return r
 
     def test(self):
-        return self.find_max_x(7) == 9
+        return self.find_max_x(8) == 5
 
     def solve(self):
-        return self.find_max_x(1000)
+        return self.find_max_x(1001)
 
 
 if __name__ == '__main__':

@@ -24,7 +24,7 @@ class Fraction:
 
         def get_common_dividers():
             return list(set(mylib.find_dividers(abs(self.n))).intersection(
-                    set(mylib.find_dividers(self.d))))
+                set(mylib.find_dividers(self.d))))
 
         cd = get_common_dividers()
         while len(cd):
@@ -165,3 +165,18 @@ class SquareRootFraction:
             c_new += 1
             # print(a_new, b_new, c_new, (self.n - b_new ** 2) / a_new)
         return c_new, a_new, b_new
+
+    def get_approximation(self, n=0):
+        a0 = self.r[0]
+        if not n:
+            return a0
+        p = len(self.r[1])
+        qq = [a0] + [self.r[1][x % p] for x in range(n)]
+        # print(a0,self.r[1], qq, qq[::-1])
+        a = None
+        for x in qq[::-1]:
+            if not a:
+                a = Fraction(x, 1)
+            else:
+                a = Fraction(x * a.n + a.d, a.n)
+        return a
