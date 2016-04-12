@@ -92,12 +92,13 @@ matrix = """
 """
 
 
-test_graph = dijkstra.Graph(test_matrix)
+test_graph = dijkstra.Graph(test_matrix, 3)
 test_path = test_graph.make_path()
 for n in test_path:
     print(n)
 p = test_graph.calc_path_length(test_path)
+print(p)
 if p == 994:
-    graph = dijkstra.Graph(matrix)
+    graph = dijkstra.Graph(matrix, 3)
     path = graph.make_path()
     print(graph.calc_path_length(path))

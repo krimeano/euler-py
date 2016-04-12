@@ -1,5 +1,6 @@
 class MatrixPath:
-    def __init__(self, txt_matrix):
+    def __init__(self, txt_matrix, paths=2):
+        self.paths = paths
         self.matrix = [[int(y) for y in x.strip().split(",") if len(y)] for x in txt_matrix.strip().split("\n")]
         self.assert_matrix()
         self.rows = len(self.matrix)
@@ -13,6 +14,13 @@ class MatrixPath:
             assert s == len(x)
 
     def next_neighbours(self, i=-1, j=-1):
+        if self.paths == 2:
+            return self.next_neighbours_2(i, j)
+
+        if self.paths == 3:
+            return self.next_neighbours_3(i, j)
+
+    def next_neighbours_2(self, i=-1, j=-1):
         if i < 0 or j < 0:
             return (0, 0),
         if i == 255 or j == 255:
@@ -26,19 +34,20 @@ class MatrixPath:
             out.append((i, j + 1))
         return tuple(out)
 
-    def previous_neighbours(self, i=-1, j=-1):
-        if i < 0 or j < 0:
-            return tuple()
+    def next_neighbours_3(self, i=-1, j=-1):
         if i == 255 or j == 255:
-            return (self.rows - 1, self.cols - 1),
-        if not (i or j):
-            return (-1, -1),
-
+            return tuple()
+        if j < 0:
+            return tuple((x, 0) for x in range(self.rows))
+        if j == self.cols - 1:
+            return tuple([(x, j) for x in range(self.rows)] + [(255, 255)])
         out = []
         if i > 0:
             out.append((i - 1, j))
-        if j > 0:
-            out.append((i, j - 1))
+        if i < self.rows - 1:
+            out.append((i + 1, j))
+        if j < self.cols - 1:
+            out.append((i, j + 1))
         return tuple(out)
 
 
@@ -64,8 +73,8 @@ class Node:
 
 
 class Graph:
-    def __init__(self, txt_matrix):
-        self.m_path = MatrixPath(txt_matrix)
+    def __init__(self, txt_matrix, paths=2):
+        self.m_path = MatrixPath(txt_matrix, paths)
         self.nodes = dict()
         self.nodes[(-1, -1)] = Node(-1, -1, self.m_path)
         self.nodes[(255, 255)] = Node(255, 255, self.m_path)
@@ -85,6 +94,9 @@ class Graph:
 
     def make_path(self):
         self.nodes[(-1, -1)].path_has_changed = True
+        # self.iterate_path()
+        # self.iterate_path()
+        # self.iterate_path()
         while len([self.nodes[x] for x in self.nodes if self.nodes[x].path_has_changed]):
             self.iterate_path()
         return self.nodes[(255, 255)].path + [self.nodes[(255, 255)]]
@@ -92,6 +104,7 @@ class Graph:
     def iterate_path(self):
         print('----- iteration -----')
         nn = [self.nodes[x] for x in self.nodes if self.nodes[x].path_has_changed]
+        change_path_after_iteration = []
         for n in nn:
             n.path_has_changed = False
             n_path = n.path + [n]
@@ -102,5 +115,7 @@ class Graph:
                 q = self.calc_path_length(k.path)
                 if q < 0 or p < q:
                     k.path = n_path
-                    k.path_has_changed = True
+                    change_path_after_iteration.append(k)
+        for k in change_path_after_iteration:
+            k.path_has_changed = True
         return self

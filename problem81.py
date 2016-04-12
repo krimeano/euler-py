@@ -96,6 +96,7 @@ matrix = """
 """
 test_graph = dijkstra.Graph(test_matrix)
 test_path = test_graph.make_path()
+print(test_path)
 for n in test_path:
     print(n)
 p = test_graph.calc_path_length(test_path)
