@@ -20,6 +20,9 @@ class MatrixPath:
         if self.paths == 3:
             return self.next_neighbours_3(i, j)
 
+        if self.paths == 4:
+            return self.next_neighbours_4(i, j)
+
     def next_neighbours_2(self, i=-1, j=-1):
         if i < 0 or j < 0:
             return (0, 0),
@@ -48,6 +51,26 @@ class MatrixPath:
             out.append((i + 1, j))
         if j < self.cols - 1:
             out.append((i, j + 1))
+        return tuple(out)
+
+    def next_neighbours_4(self, i=-1, j=-1):
+        if i < 0 or j < 0:
+            return (0, 0),
+        if i == 255 or j == 255:
+            return tuple()
+        out = []
+
+        if 255 > i > 0:
+            out.append((i - 1, j))
+        if i < self.rows - 1:
+            out.append((i + 1, j))
+        if 255 > j > 0:
+            out.append((i, j - 1))
+        if j < self.cols - 1:
+            out.append((i, j + 1))
+
+        if i == self.rows - 1 and j == self.cols - 1:
+            out.append((255, 255))
         return tuple(out)
 
 
