@@ -110,7 +110,7 @@ def gather_dividers(a):
                 is_found = True
         if not is_found:
             out.append([x])
-    return out
+    return tuple(tuple(x) for x in out)
 
 
 def product_lists(aa, bb, c_max=0):
@@ -416,7 +416,7 @@ class Dices:
                 outs = tuple(Dices.cache[key][:])
             else:
                 outs = Dices.calc_outs_next_dice(dice, outs)
-                print("\033[F\033[K", dice, "x", i+1,  sum(outs))
+                print("\033[F\033[K", dice, "x", i + 1, sum(outs))
                 Dices.cache[key] = outs
         return outs
 
