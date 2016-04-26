@@ -8,15 +8,21 @@ ss = [i ** 2 for i in range(n_max + 1)]
 print(ss[:5], '.' * round(math.log((len(ss) - 10), 10)), ss[-5:])
 
 r = 0
+aa = dict()
 for i in range(n_max, 1, -1):
-    s = ss[i]
+    a = ss[i]
     for j in range(i - 1, 0, -1):
-        s += ss[j]
-        if s > m:
+        a += ss[j]
+        # t = sum([x ** 2 for x in range(j, i + 1)])
+        if a > m:
             break
-        if str(s) == str(s)[::-1]:
-            r += s
-            print(i, j, s, r)
+        if str(a) == str(a)[::-1]:
+            if a in aa:
+                print(a, 'is already counted:', aa[a])
+            else:
+                r += a
+                aa[a] = (j, i)
+            print(i, j, a, r)
 
 print(r)
 # 2916867073
