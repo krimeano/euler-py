@@ -1,5 +1,7 @@
 import math
+from datetime import datetime
 
+t1 = datetime.now()
 m = 10 ** 8
 n_max = math.floor(((2 * m - 1) ** 0.5 + 1) / 2)
 print(m, n_max, n_max ** 2, n_max ** 2 + (n_max - 1) ** 2, n_max ** 2 + (n_max + 1) ** 2)
@@ -13,7 +15,6 @@ for i in range(n_max, 1, -1):
     a = ss[i]
     for j in range(i - 1, 0, -1):
         a += ss[j]
-        # t = sum([x ** 2 for x in range(j, i + 1)])
         if a > m:
             break
         if str(a) == str(a)[::-1]:
@@ -22,7 +23,7 @@ for i in range(n_max, 1, -1):
             else:
                 r += a
                 aa[a] = (j, i)
-            print(i, j, a, r)
-
-print(r)
+            print((j, i), a, r)
+t2 = datetime.now()
+print(r, t2 - t1)
 # 2916867073
