@@ -45,16 +45,6 @@ class Sudoku:
         return self
 
     def __str__(self):
-        # out = [str(x) for x in self.data]
-        # for i in range(len(self.data)):
-        #     out_row = ''
-        #     if not i % 3:
-        #         out.append('')
-        #     row = self.data[i]
-        #     for j in range(len(row)):
-        #         if not j % 3:
-        #             out_row += ' '
-        #         out_row += str(row[j])
         #     out.append(out_row)
         out = []
         for i in range(0, len(self.data), 9):
