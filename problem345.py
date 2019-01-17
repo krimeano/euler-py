@@ -60,7 +60,23 @@ class Matrix:
         self._find_nulls()
         print_matrix(self.data_n)
 
+        print('get graph')
+        graph = Graph(self.data_r)
+        print('edges:', graph.edges)
         return 0
+
+
+class Graph:
+    def __init__(self, mx):
+        self._matrix = mx
+        self.edges = tuple()
+        self._find_edges()
+
+    def _find_edges(self):
+        for i in range(len(self._matrix)):
+            for j in range(len(self._matrix[i])):
+                if not self._matrix[i][j]:
+                    self.edges = self.edges + ((i, j),)
 
 
 class Problem345:
