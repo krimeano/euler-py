@@ -1,29 +1,19 @@
+def print_matrix(mx):
+    w = len(str(max([max(x) for x in mx])))
+    print('[[' + ']\n ['.join([', '.join([' ' * (w - len(str(y))) + str(y) for y in x]) for x in mx]) + ']]\n')
+
+
+def transpone(mx):
+    return [[mx[j][i] for j in range(len(mx[i]))] for i in range(len(mx))]
+
+
 class Matrix:
     def __init__(self, txt):
-        self.it = 0
         self.raw = txt
         self.data = []
+        self.data_r = []
+        self.data_n = []
         self._process_raw()
-
-    def sum(self):
-        self.it = 0
-        s = self.compare(self.data)
-        return s
-
-    def compare(self, m):
-        self.it += 1
-        print('compare #' + str(self.it), m, )
-
-        if len(m) == 1:
-            return m[0][0]
-        ss = []
-        for i in range(len(m)):
-            ss.append(m[i][0] + self.compare(self.cut(i, m)))
-        print('max from', ss, max(ss))
-        return max(ss)
-
-    def cut(self, x, m):
-        return [m[i][1:] for i in range(len(m)) if i != x]
 
     def _process_raw(self):
         data = [[int(y) for y in x.strip().split(' ') if len(y)] for x in self.raw.split('\n') if len(x)]
@@ -31,8 +21,46 @@ class Matrix:
         for x in data:
             if a != len(x):
                 raise AssertionError('can not parse the matrix')
-        print(data)
         self.data = data
+
+    def _revert(self):
+        m = max(max(x) for x in self.data)
+        self.data_r = [[m - y for y in x] for x in self.data]
+
+    def _reduce_rows(self):
+        for i in range(len(self.data_r)):
+            x = self.data_r[i]
+            m = min(x)
+            self.data_r[i] = [y - m for y in x]
+
+    def _reduce_columns(self):
+        self.data_r = transpone(self.data_r)
+        self._reduce_rows()
+        self.data_r = transpone(self.data_r)
+
+    def _find_nulls(self):
+        self.data_n = [[1 - (y and 1 or 0) for y in x] for x in self.data_r]
+
+    def sum(self):
+        print_matrix(self.data)
+
+        print('revert values to find minimum')
+        self._revert()
+        print_matrix(self.data_r)
+
+        print('reduce rows')
+        self._reduce_rows()
+        print_matrix(self.data_r)
+
+        print('reduce columns')
+        self._reduce_columns()
+        print_matrix(self.data_r)
+
+        print('find nulls')
+        self._find_nulls()
+        print_matrix(self.data_n)
+
+        return 0
 
 
 class Problem345:
@@ -78,3 +106,9 @@ if __name__ == '__main__':
         print(Problem345.solve())
     else:
         print('NOT SOLVED YET')
+
+"""
+[0, 4), [1, 4), [2, 4), [3, 2), [3, 3), [4, 0), [4, 1)
+(0, 4], [1, 4), [2, 4), (3, 2], [3, 3), (4, 0], [4, 1)
+
+"""
