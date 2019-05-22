@@ -1,4 +1,5 @@
-import math, sys, os
+import math
+import os
 
 known_primes = dict()
 
@@ -113,11 +114,13 @@ def gather_dividers(a):
     return tuple(tuple(x) for x in out)
 
 
-def product_lists(aa, bb, c_max=0):
+def product_lists(aa, bb, c_max=0, mod=0):
     cc = []
     for a in aa:
         for b in bb:
             c = a * b
+            if mod:
+                c = c % mod
             if not c_max or c <= c_max:
                 cc.append(c)
     return sorted(cc)
