@@ -9,15 +9,15 @@ import mylib
 
 mod = 1000000007
 
-cached_dividers = [((1,),)]
+cached_dividers = dict()
 
 
 def make_cached_dividers(n):
     for x in range(1, n + 1):
-        cached_dividers.append(mylib.gather_dividers(x))
+        cached_dividers[x] = mylib.gather_dividers(x)
 
 
-cached_dmap = [{}, {}]
+cached_dmap = {1: {}}
 
 
 def make_cached_dmap(n):
@@ -35,7 +35,7 @@ def make_cached_dmap(n):
             dmap[d] = dmap[d] + dmap_minus[d]
         dmap = {d: p for (d, p) in dmap.items() if p}
         # print(x, dmap)
-        cached_dmap.append(dmap)
+        cached_dmap[x] = dmap
 
 
 mm = dict()
@@ -62,7 +62,7 @@ if __name__ == '__main__':
     k = 20000
     r = 0
     make_cached_dividers(k)
-    print('dividers are cached', round(time.time() - t_start, 3), 's', cached_dividers[-10:])
+    print('dividers are cached', round(time.time() - t_start, 3), 's', cached_dividers[k])
     make_cached_dmap(k)
     print('dmap is cached', round(time.time() - t_start, 3), 's', cached_dmap[k])
 
