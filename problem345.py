@@ -26,57 +26,98 @@ class Matrix:
     def _revert(self):
         m = max(max(x) for x in self.data)
         self.data_r = [[m - y for y in x] for x in self.data]
+        return self
 
     def _reduce_rows(self):
         for i in range(len(self.data_r)):
             x = self.data_r[i]
             m = min(x)
             self.data_r[i] = [y - m for y in x]
+        return self
 
     def _reduce_columns(self):
         self.data_r = transpone(self.data_r)
         self._reduce_rows()
         self.data_r = transpone(self.data_r)
+        return self
 
     def _find_nulls(self):
         self.data_n = [[1 - (y and 1 or 0) for y in x] for x in self.data_r]
+        return self
 
     def sum(self):
         print_matrix(self.data)
+        self._revert() \
+            ._reduce_rows() \
+            ._reduce_columns()
 
-        print('revert values to find minimum')
-        self._revert()
         print_matrix(self.data_r)
-
-        print('reduce rows')
-        self._reduce_rows()
-        print_matrix(self.data_r)
-
-        print('reduce columns')
-        self._reduce_columns()
-        print_matrix(self.data_r)
-
-        print('find nulls')
-        self._find_nulls()
-        print_matrix(self.data_n)
 
         print('get graph')
         graph = Graph(self.data_r)
+        print('X:', graph.vX)
+        print('Y:', graph.vY)
         print('edges:', graph.edges)
+        graph.match()
         return 0
 
 
 class Graph:
     def __init__(self, mx):
         self._matrix = mx
-        self.edges = tuple()
-        self._find_edges()
+        self.vX = set()
+        self.vY = set()
+        self.mX = set()
+        self.mY = set()
+        self.matches = set()
+        self.edges = set()
+        self._find_vertices() \
+            ._find_edges()
+
+    def _find_vertices(self):
+        for x in range(len(self._matrix)):
+            self.vX.add(x)
+
+        for y in range(len(self._matrix[0])):
+            self.vY.add(y)
+        return self
 
     def _find_edges(self):
-        for i in range(len(self._matrix)):
-            for j in range(len(self._matrix[i])):
-                if not self._matrix[i][j]:
-                    self.edges = self.edges + ((i, j),)
+        for x in self.vX:
+            for y in self.vY:
+                if not self._matrix[x][y]:
+                    self.edges.add((x, y))
+        return self
+
+    def match(self):
+        self.mX = set()
+        self.mY = set()
+        self.matches = set()
+        print('match vertices')
+        x = self.find_less_matched_x()
+        print(x)
+        y = self.find_less_matched_y_for_x(3)
+        print(y)
+        return self
+
+    def find_less_matched_x(self):
+        out = -1
+        min_edges = len(self.edges)
+        for x in self.vX:
+            ee = [e for e in self.edges if e[0] == x]
+            w = len(ee)
+            if w < min_edges:
+                out = x
+                min_edges = w
+        return out
+
+    def find_less_matched_y_for_x(self, x):
+        out = -1
+        min_edges = len(self.edges)
+        ee = [e for e in self.edges if e[0] == x]
+        for e in ee:
+            print(x, e)
+        return out
 
 
 class Problem345:
