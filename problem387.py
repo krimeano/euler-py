@@ -95,7 +95,7 @@ class Problem387():
         return 90619 == sum(self.rr)
 
     def solve(self):
-        p = 14
+        p = 10
         self.init_primes(p)
         self.make_right_harshads(p - 1).filter_strong().make_primes()
         return sum(self.rr)
