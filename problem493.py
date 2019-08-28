@@ -49,24 +49,10 @@ def get_s(m, n):
     if m * b < n:
         return 0
 
-    if m == n:
-        return get_s(m - 1, n - 1) * get_p(m - 1, n - 1)
-
     return get_s(m - 1, n - 1) * get_p(m - 1, n - 1) + get_s(m, n - 1) * get_q(m, n - 1)
 
 
 if __name__ == '__main__':
-    for x in range(a + 1):
-        for y in range(x, c):
-            pv = get_p(x, y)
-            qv = get_q(x, y)
-            print(x, y,
-                  '>', '%d/%d' % (d - b * x, d - y), '=', round(1000 * pv) / 1000,
-                  '>', '%d/%d' % (b * x - y, d - y), '=', round(1000 * qv) / 1000,
-                  '>', pv + qv
-                  )
-
-    for y in range(1, 21):
-        ss = [get_s(x, y) for x in range(1, min(a + 1, y + 1))]
-        m = sum([(i + 1) * ss[i] for i in range(len(ss))])
-        print(y, sum(ss), m, ss)
+    ss = [get_s(x, c) for x in range(1, a + 1)]
+    m = sum([(i + 1) * ss[i] for i in range(len(ss))])
+    print(sum(ss), m, ss)
