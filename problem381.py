@@ -1,28 +1,18 @@
-import mylib, sys
+import mylib
 
-L = 10 ** 2
-pp = mylib.make_primes_sieve_atkin(L)
+L = 10 ** 8
+pp = mylib.primes_from_file(L)
 
-
-def my_fact2(p):
-    out = 1
-    if p < 10:
-        for x in range(1, p - 4):
-            out = (out * x) % p
-        return out
-    out = 24 % p
-    for x in range(5, (p + 1) // 2):
-        out = (((p - out) * x) % p * x) % p
-    return out
+k = {1: 3, 3: 1, 5: 7, 7: 5}
 
 
 def s3(p):
-    return (my_fact2(p) * 9) % p
+    return (p * k[p % 8] - 3) // 8
 
 
 sigma = 0
 for a in pp:
-    if a < 5:
+    if a < 5 or a >= L:
         continue
     sa = s3(a)
     sigma += sa

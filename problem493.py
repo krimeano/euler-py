@@ -39,6 +39,8 @@ def get_q(m, n):
 
 
 def get_s(m, n):
+    # print('get_s', m, n)
+
     if not m:
         if not n:
             return 1
@@ -53,6 +55,7 @@ def get_s(m, n):
 
 
 if __name__ == '__main__':
-    ss = [get_s(x, c) for x in range(1, a + 1)]
-    m = sum([(i + 1) * ss[i] for i in range(len(ss))])
-    print(sum(ss), m, ss)
+    for e in range(1, 41):
+        ss = [get_s(x, e) for x in range(1, min(e + 1, a + 1))]
+        m = sum([(i + 1) * ss[i] for i in range(len(ss))])
+        print(e, m)
